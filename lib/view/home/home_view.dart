@@ -4,12 +4,14 @@ import 'package:provider/provider.dart';
 import 'package:dotted_dashed_line/dotted_dashed_line.dart';
 import 'package:x_trainer/common_widget/round_button.dart';
 import 'package:x_trainer/common_widget/workout_row.dart';
+import 'package:x_trainer/common_widget/bmi_card.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_animation_progress_bar/simple_animation_progress_bar.dart';
 import 'package:simple_circular_progress_bar/simple_circular_progress_bar.dart';
 import '../../common/color_extension.dart';
 import '../../providers/profile_provider.dart';
+import '../profile/profile_view.dart';
 import '../profile/weekly_chart.dart';
 import 'activity_tracker_view.dart';
 import 'finished_workout_view.dart';
@@ -236,6 +238,59 @@ class _HomeViewState extends State<HomeView> {
                             ),
                           ),
                         ),
+                        const SizedBox(width: 8),
+                        // Profile Avatar
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ProfileView(),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            width: 36,
+                            height: 36,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: TColor.primaryColor1,
+                                width: 2,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.1),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: ClipOval(
+                              child: profile.profileImageUrl.isNotEmpty
+                                  ? Image.network(
+                                      profile.profileImageUrl,
+                                      width: 34,
+                                      height: 34,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return Image.asset(
+                                          "assets/img/u1.png",
+                                          width: 34,
+                                          height: 34,
+                                          fit: BoxFit.cover,
+                                        );
+                                      },
+                                    )
+                                  : Image.asset(
+                                      "assets/img/u1.png",
+                                      width: 34,
+                                      height: 34,
+                                      fit: BoxFit.cover,
+                                    ),
+                            ),
+                          ),
+                        ),
                       ],
                     )
                   ],
@@ -243,78 +298,7 @@ class _HomeViewState extends State<HomeView> {
                 SizedBox(
                   height: media.width * 0.05,
                 ),
-                Container(
-                  height: media.width * 0.4,
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(colors: TColor.primaryG),
-                      borderRadius: BorderRadius.circular(media.width * 0.075)),
-                  child: Stack(alignment: Alignment.center, children: [
-                    Image.asset(
-                      "assets/img/bg_dots.png",
-                      height: media.width * 0.4,
-                      width: double.maxFinite,
-                      fit: BoxFit.fitHeight,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 25, horizontal: 25),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "BMI (Body Mass Index)",
-                                style: TextStyle(
-                                    color: TColor.white,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700),
-                              ),
-                              Text(
-                                "You have a normal weight",
-                                style: TextStyle(
-                                    color: TColor.white.withValues(alpha: 0.7),
-                                    fontSize: 12),
-                              ),
-                              SizedBox(
-                                height: media.width * 0.05,
-                              ),
-                              SizedBox(
-                                  width: 120,
-                                  height: 35,
-                                  child: RoundButton(
-                                      title: "View More",
-                                      type: RoundButtonType.bgSGradient,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
-                                      onPressed: () {})),
-                            ],
-                          ),
-                          AspectRatio(
-                            aspectRatio: 1,
-                            child: PieChart(
-                              PieChartData(
-                                pieTouchData: PieTouchData(
-                                  touchCallback:
-                                      (FlTouchEvent event, pieTouchResponse) {},
-                                ),
-                                startDegreeOffset: 250,
-                                borderData: FlBorderData(
-                                  show: false,
-                                ),
-                                sectionsSpace: 1,
-                                centerSpaceRadius: 0,
-                                sections: showingSections(),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  ]),
-                ),
+                const BMICard(),
                 SizedBox(
                   height: media.width * 0.05,
                 ),

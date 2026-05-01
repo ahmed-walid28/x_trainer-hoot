@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
 
 import 'package:x_trainer/common/color_extension.dart';
 import 'package:x_trainer/common_widget/round_button.dart';
 import 'package:x_trainer/common_widget/round_textfield.dart';
+import 'package:x_trainer/common_widget/google_sign_in_button.dart';
+import 'package:x_trainer/providers/profile_provider.dart';
 import 'package:x_trainer/view/login/sign_up_view.dart';
+import 'package:x_trainer/view/login/signup_view.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -78,6 +82,49 @@ class _LoginViewState extends State<LoginView> {
         duration: const Duration(seconds: 3),
       ),
     );
+  }
+
+  Future<void> _handleGoogleSignIn() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final profile = Provider.of<ProfileProvider>(context, listen: false);
+      final isNewUser = await profile.signInWithGoogle();
+
+      if (!mounted) return;
+
+      if (isNewUser) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const CompleteProfileView()),
+          (route) => false,
+        );
+      } else {
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/home',
+          (route) => false,
+        );
+      }
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
+      if (e.code == 'account-exists-with-different-credential') {
+        _showError('This email is already registered. Please log in with your email and password.');
+      } else {
+        _showError(e.message ?? 'Google sign-in failed');
+      }
+    } catch (e) {
+      if (!mounted) return;
+      _showError('Error: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   void _showForgotPasswordDialog() {
@@ -246,6 +293,15 @@ class _LoginViewState extends State<LoginView> {
                       ],
                     ),
                   ),
+                ),
+                SizedBox(height: media.width * 0.04),
+                const Text(
+                  "Or",
+                  style: TextStyle(color: Colors.grey, fontSize: 14),
+                ),
+                SizedBox(height: media.width * 0.04),
+                GoogleSignInButton(
+                  onPressed: _handleGoogleSignIn,
                 ),
               ],
             ),

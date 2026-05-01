@@ -37,101 +37,162 @@ class _MainTabViewState extends State<MainTabView> {
         bucket: pageBucket,
         child: _tabs[selectTab],
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: SizedBox(
-        width: 70,
-        height: 70,
-        child: InkWell(
-          onTap: () {
-            setState(() {
-              selectTab = 2; // زر الكاميرا يفتح Workout Tracker
-            });
-          },
-          child: Container(
-            width: 65,
-            height: 65,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(colors: TColor.primaryG),
-              borderRadius: BorderRadius.circular(35),
-              boxShadow: const [
-                BoxShadow(color: Colors.black12, blurRadius: 2),
-              ],
-            ),
-            child: Icon(
-              Icons.photo_camera,
-              color: TColor.white,
-              size: 30,
-            ),
+      bottomNavigationBar: Container(
+        height: 65,
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.95), // White semi-transparent
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
           ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.1),
+              blurRadius: 8,
+              offset: const Offset(0, -3),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            // زر 1: Home
+            _buildNavItem(
+              icon: "assets/img/home_tab.png",
+              selectIcon: "assets/img/home_tab_select.png",
+              label: "Home",
+              isActive: selectTab == 0,
+              onTap: () {
+                setState(() {
+                  selectTab = 0;
+                });
+              },
+            ),
+
+            // زر 2: Search (Meal Planner)
+            _buildNavItem(
+              icon: "assets/img/activity_tab.png",
+              selectIcon: "assets/img/activity_tab_select.png",
+              label: "Search",
+              isActive: selectTab == 1,
+              onTap: () {
+                setState(() {
+                  selectTab = 1;
+                });
+              },
+            ),
+
+            // زر الكاميرا في النص
+            _buildCenterCameraButton(),
+
+            // زر 4: History (Sleep Tracker)
+            _buildNavItem(
+              icon: "assets/img/meal_tab.png",
+              selectIcon: "assets/img/meal_tab_select.png",
+              label: "History",
+              isActive: selectTab == 3,
+              onTap: () {
+                setState(() {
+                  selectTab = 3;
+                });
+              },
+            ),
+
+            // زر 5: Profile
+            _buildNavItem(
+              icon: "assets/img/profile_tab.png",
+              selectIcon: "assets/img/profile_tab_select.png",
+              label: "Profile",
+              isActive: selectTab == 4,
+              onTap: () {
+                setState(() {
+                  selectTab = 4;
+                });
+              },
+            ),
+          ],
         ),
       ),
-      bottomNavigationBar: BottomAppBar(
-        child: Container(
-          height: kToolbarHeight,
-          decoration: BoxDecoration(
-            color: TColor.white,
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.black12,
-                blurRadius: 2,
-                offset: Offset(0, -2),
+    );
+  }
+
+  Widget _buildNavItem({
+    required String icon,
+    required String selectIcon,
+    required String label,
+    required bool isActive,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: isActive
+                  ? TColor.primaryColor1.withValues(alpha: 0.15)
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Center(
+              child: Image.asset(
+                isActive ? selectIcon : icon,
+                width: 22,
+                height: 22,
+                color: isActive ? TColor.primaryColor1 : Colors.grey.shade600,
+                errorBuilder: (context, error, stackTrace) {
+                  return Icon(
+                    Icons.error_outline,
+                    color: isActive ? TColor.primaryColor1 : Colors.grey.shade600,
+                    size: 22,
+                  );
+                },
               ),
-            ],
+            ),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              // زر 1: Home
-              TabButton(
-                icon: "assets/img/home_tab.png",
-                selectIcon: "assets/img/home_tab_select.png",
-                isActive: selectTab == 0,
-                onTap: () {
-                  setState(() {
-                    selectTab = 0;
-                  });
-                },
-              ),
-
-              // زر 2: Meal Planner
-              TabButton(
-                icon: "assets/img/activity_tab.png",
-                selectIcon: "assets/img/activity_tab_select.png",
-                isActive: selectTab == 1,
-                onTap: () {
-                  setState(() {
-                    selectTab = 1;
-                  });
-                },
-              ),
-
-              const SizedBox(width: 40), // مسافة لزر الكاميرا في النص
-
-              // زر 4: Sleep Tracker
-              TabButton(
-                icon: "assets/img/meal_tab.png",
-                selectIcon: "assets/img/meal_tab_select.png",
-                isActive: selectTab == 3,
-                onTap: () {
-                  setState(() {
-                    selectTab = 3;
-                  });
-                },
-              ),
-
-              // زر 5: Profile
-              TabButton(
-                icon: "assets/img/profile_tab.png",
-                selectIcon: "assets/img/profile_tab_select.png",
-                isActive: selectTab == 4,
-                onTap: () {
-                  setState(() {
-                    selectTab = 4;
-                  });
-                },
-              ),
-            ],
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: TextStyle(
+              color: isActive ? TColor.primaryColor1 : Colors.grey.shade600,
+              fontSize: 10,
+              fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
+            ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCenterCameraButton() {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          selectTab = 2;
+        });
+      },
+      child: Container(
+        width: 55,
+        height: 55,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(colors: TColor.primaryG),
+          borderRadius: BorderRadius.circular(50),
+          boxShadow: [
+            BoxShadow(
+              color: TColor.primaryColor1.withValues(alpha: 0.35),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Icon(
+          Icons.photo_camera,
+          color: TColor.white,
+          size: 26,
         ),
       ),
     );

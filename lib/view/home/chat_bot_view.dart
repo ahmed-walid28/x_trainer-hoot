@@ -1,8 +1,10 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
-import 'package:http/http.dart' as http; // مضافة للربط
-import 'dart:convert'; // مضافة للتعامل مع البيانات
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import '../../models/fitness_memory.dart';
 
 class ChatBotView extends StatefulWidget {
   const ChatBotView({super.key});
@@ -19,7 +21,7 @@ class _ChatBotViewState extends State<ChatBotView> {
   bool _speechAvailable = false;
   bool _showIntroSection = true;
   bool _showBackToHomeInChat = false;
-  bool _isLoading = false; // لمتابعة حالة الرد من بايثون
+  bool _isLoading = false;
 
   String? selectedFileName;
   bool isImageSelected = false;
@@ -29,11 +31,70 @@ class _ChatBotViewState extends State<ChatBotView> {
   List<stt.LocaleName> _locales = [];
   String? _currentLocaleId;
 
+  // AI Coach Fitness Memory
+  FitnessMemory _fitnessMemory = FitnessMemory();
+  bool _profileLoaded = false;
+
   @override
   void initState() {
     super.initState();
     _speech = stt.SpeechToText();
     _initSpeech();
+    _loadFitnessMemory();
+  }
+
+  // Load fitness memory (AI Coach profile)
+  Future<void> _loadFitnessMemory() async {
+    try {
+      // Skip file loading on Web - use memory only
+      if (!kIsWeb) {
+        _fitnessMemory = await FitnessMemory.load();
+      }
+      setState(() {
+        _profileLoaded = true;
+      });
+      
+      // If we have a complete profile, show welcome back message
+      if (_fitnessMemory.isProfileComplete) {
+        final welcomeMsg = _fitnessMemory.name != null 
+            ? 'أهلاً ${_fitnessMemory.name}! هدفك الحالي هو ${_fitnessMemory.goal} وهدف السعرات: ${_fitnessMemory.calculatedTargetKcal?.round()} kcal/day. إيه اللي تحب تعمله النهارده؟'
+            : 'Welcome back! Goal: ${_fitnessMemory.goal}, Target: ${_fitnessMemory.calculatedTargetKcal?.round()} kcal/day. What would you like to do?';
+        
+        setState(() {
+          _messages.add(_ChatMessage(text: welcomeMsg, isUser: false));
+          _showIntroSection = false;
+          _showBackToHomeInChat = true;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading fitness memory: $e');
+    }
+  }
+
+  // Save fitness memory
+  Future<void> _saveFitnessMemory() async {
+    try {
+      // Skip file saving on Web
+      if (!kIsWeb) {
+        await _fitnessMemory.save();
+      }
+      _showSnack(_fitnessMemory.name != null 
+          ? 'تم حفظ بياناتك! 💪' 
+          : 'Your profile has been saved! 💪');
+    } catch (e) {
+      debugPrint('Error saving fitness memory: $e');
+    }
+  }
+
+  // Check if user is ending session
+  bool _isSessionEnding(String text) {
+    final endKeywords = [
+      'bye', 'goodbye', 'thanks', 'thank you', 'see you',
+      'مع السلامة', 'شكراً', 'شكرا', 'باي', 'سلام',
+      'talk later', 'later', 'see ya', 'مشي', 'خروج'
+    ];
+    final lowerText = text.toLowerCase();
+    return endKeywords.any((keyword) => lowerText.contains(keyword));
   }
 
   Future<void> _initSpeech() async {
@@ -424,39 +485,70 @@ class _ChatBotViewState extends State<ChatBotView> {
     );
   }
 
-  // --- الربط الحقيقي مع السيرفر ---
+  // --- AI Coach Chat Endpoint ---
   Future<void> _sendMessage() async {
     final text = _messageController.text.trim();
     if (text.isEmpty) return;
+
+    // Extract profile data from message
+    _fitnessMemory.updateFromMessage(text);
+    
+    // Check if session is ending
+    final isEnding = _isSessionEnding(text);
 
     setState(() {
       _messages.add(_ChatMessage(text: text, isUser: true));
       _showIntroSection = false;
       _showBackToHomeInChat = true;
-      _isLoading = true; // تفعيل مؤشر التحميل
+      _isLoading = true;
       _messageController.clear();
     });
 
     try {
-      // الـ IP الخاص بك
-      final url = Uri.parse('http://10.194.217.7:5000/chat');
+      // Prepare conversation history
+      final history = _messages.map((m) => {
+        'text': m.text,
+        'is_user': m.isUser,
+      }).toList();
+
+      // AI Coach endpoint - use localhost for Web, IP for mobile
+      final serverUrl = kIsWeb 
+          ? 'http://localhost:5000/chat' 
+          : 'http://10.194.217.7:5000/chat';
+      final url = Uri.parse(serverUrl);
+      
       final response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"question": text}),
+        body: jsonEncode({
+          "question": text,
+          "profile": _fitnessMemory.toJson(),
+          "history": history,
+        }),
       ).timeout(const Duration(minutes: 2));
 
       if (response.statusCode == 200) {
-        // فك ترميز النصوص العربية
         final data = jsonDecode(utf8.decode(response.bodyBytes));
         setState(() {
           _messages.add(_ChatMessage(text: data['answer'], isUser: false));
         });
+        
+        // If session ended, save profile
+        if (isEnding || data['session_ended'] == true) {
+          await _saveFitnessMemory();
+        }
       } else {
         _showSnack("Error: ${response.statusCode}");
       }
     } catch (e) {
       _showSnack("Connection failed! Check Python server.");
+      // Fallback: simple local response
+      setState(() {
+        _messages.add(_ChatMessage(
+          text: "Sorry, I can't connect to the AI server. Please make sure the Python server is running at ${kIsWeb ? 'http://localhost:5000' : 'http://10.194.217.7:5000'}",
+          isUser: false,
+        ));
+      });
     } finally {
       if (mounted) {
         setState(() {

@@ -38,6 +38,12 @@ class _ProfileViewState extends State<ProfileView> {
           IconButton(
             onPressed: () async {
               await profile.signOut();
+              if (!mounted) return;
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                '/login',
+                (route) => false,
+              );
             },
             icon: Icon(Icons.logout, color: TColor.secondaryColor1),
           )
@@ -53,12 +59,27 @@ class _ProfileViewState extends State<ProfileView> {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(30),
-                  child: Image.asset(
-                    "assets/img/u1.png", // صورة افتراضية أو ممكن تغيرها
-                    width: 50,
-                    height: 50,
-                    fit: BoxFit.cover,
-                  ),
+                  child: profile.profileImageUrl.isNotEmpty
+                      ? Image.network(
+                          profile.profileImageUrl,
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Image.asset(
+                              "assets/img/u1.png",
+                              width: 50,
+                              height: 50,
+                              fit: BoxFit.cover,
+                            );
+                          },
+                        )
+                      : Image.asset(
+                          "assets/img/u1.png",
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.cover,
+                        ),
                 ),
                 const SizedBox(width: 15),
                 Expanded(
@@ -89,12 +110,27 @@ class _ProfileViewState extends State<ProfileView> {
                   height: 30,
                   child: ElevatedButton(
                     onPressed: () {
+                      final profile = Provider.of<ProfileProvider>(context, listen: false);
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const EditProfileView(),
+                          builder: (context) => EditProfileView(
+                            currentProfile: {
+                              'firstName': profile.firstName,
+                              'lastName': profile.lastName,
+                              'email': profile.email,
+                              'height': profile.height,
+                              'weight': profile.weight,
+                              'age': profile.age,
+                              'gender': profile.gender,
+                              'goal': profile.goal,
+                            },
+                          ),
                         ),
-                      );
+                      ).then((_) {
+                        final profile = Provider.of<ProfileProvider>(context, listen: false);
+                        profile.loadUserProfile();
+                      });
                     },
                     style: ElevatedButton.styleFrom(
                         backgroundColor: TColor.primaryColor1,

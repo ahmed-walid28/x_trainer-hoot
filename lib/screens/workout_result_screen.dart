@@ -20,45 +20,74 @@ class _WorkoutResultScreenState extends State<WorkoutResultScreen> {
   bool _isSaving = false; // عشان نظهر علامة تحميل والبيانات بتتبعت
 
   Future<void> _saveAndExit() async {
+    print("🚀 Starting save workout...");
     setState(() {
       _isSaving = true;
     });
 
     try {
       final user = FirebaseAuth.instance.currentUser;
+      print("👤 Current user: ${user?.uid ?? 'NULL'}");
+      
       if (user != null) {
         // حساب السعرات
         final double caloriesBurned = widget.totalReps * 0.4;
+        print("🔥 Calories: $caloriesBurned");
 
         // 1. تجهيز البيانات
         final workoutData = {
           'exercise': widget.exerciseType,
           'reps': widget.totalReps,
           'calories': caloriesBurned,
-          'date': FieldValue.serverTimestamp(), // وقت السيرفر
+          'date': FieldValue.serverTimestamp(),
+          'userId': user.uid,
         };
+        print("📊 Data prepared: $workoutData");
 
-        // 2. الحفظ داخل مستند المستخدم في كوليكشن اسمه 'workouts'
-        await FirebaseFirestore.instance
+        // 2. الحفظ في Firestore
+        print("💾 Saving to Firestore...");
+        final docRef = await FirebaseFirestore.instance
             .collection('users')
             .doc(user.uid)
             .collection('workouts')
             .add(workoutData);
-
-        print("✅ Workout Saved Successfully!");
+        
+        print("✅ Workout Saved! Doc ID: ${docRef.id}");
+        
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Workout saved successfully! 💪"),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      } else {
+        print("❌ No user logged in!");
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Please login first!"),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       print("❌ Error saving workout: $e");
-      // ممكن تظهر رسالة خطأ هنا لو حابب
+      print("📍 Stack trace: $stackTrace");
+      
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error saving: $e")),
+        SnackBar(
+          content: Text("Error saving workout: $e"),
+          backgroundColor: Colors.red,
+        ),
       );
     } finally {
-      // 3. في كل الأحوال (حفظ أو فشل) نرجع للصفحة الرئيسية
+      // 3. نرجع للصفحة الرئيسية
       if (mounted) {
         setState(() {
           _isSaving = false;
         });
+        print("🏠 Navigating back to home...");
         Navigator.popUntil(context, (route) => route.isFirst);
       }
     }

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 
 import 'package:x_trainer/common/color_extension.dart';
 import 'package:x_trainer/common_widget/round_button.dart';
 import 'package:x_trainer/common_widget/round_textfield.dart';
+import 'package:x_trainer/common_widget/google_sign_in_button.dart';
+import 'package:x_trainer/providers/profile_provider.dart';
 import 'package:x_trainer/view/login/signup_view.dart';
 
 class SignUpView extends StatefulWidget {
@@ -103,6 +106,49 @@ class _SignUpViewState extends State<SignUpView> {
     }
   }
 
+  Future<void> _handleGoogleSignIn() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final profile = Provider.of<ProfileProvider>(context, listen: false);
+      final isNewUser = await profile.signInWithGoogle();
+
+      if (!mounted) return;
+
+      if (isNewUser) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const CompleteProfileView()),
+          (route) => false,
+        );
+      } else {
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/home',
+          (route) => false,
+        );
+      }
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
+      if (e.code == 'account-exists-with-different-credential') {
+        _showError('This email is already registered. Please log in with your email and password.');
+      } else {
+        _showError(e.message ?? 'Google sign-in failed');
+      }
+    } catch (e) {
+      if (!mounted) return;
+      _showError('Error: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -150,30 +196,64 @@ class _SignUpViewState extends State<SignUpView> {
   @override
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context).size;
+    final isSmallScreen = media.width < 360;
+    final isTablet = media.width >= 600;
 
     return Scaffold(
       backgroundColor: TColor.white,
-      body: SingleChildScrollView(
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+      appBar: AppBar(
+        backgroundColor: TColor.white,
+        elevation: 0,
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: Icon(
+            Icons.arrow_back_ios,
+            color: TColor.black,
+            size: 20,
+          ),
+        ),
+        title: Text(
+          "Sign Up",
+          style: TextStyle(
+            color: TColor.black,
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        centerTitle: true,
+      ),
+      body: Center(
+        child: SingleChildScrollView(
+          child: Container(
+            constraints: BoxConstraints(
+              maxWidth: isTablet ? 500 : media.width,
+            ),
+            padding: EdgeInsets.symmetric(
+              horizontal: isTablet ? 40 : 20,
+              vertical: isSmallScreen ? 10 : 20,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SizedBox(height: media.width * 0.1),
+                SizedBox(height: isSmallScreen ? 10 : media.width * 0.05),
                 Text(
                   "Hey there,",
-                  style: TextStyle(color: TColor.gray, fontSize: 16),
+                  style: TextStyle(
+                    color: TColor.gray,
+                    fontSize: isSmallScreen ? 14 : 16,
+                  ),
                 ),
                 Text(
                   "Create Account",
                   style: TextStyle(
                     color: TColor.black,
-                    fontSize: 20,
+                    fontSize: isSmallScreen ? 18 : 20,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                SizedBox(height: media.width * 0.05),
+                SizedBox(height: isSmallScreen ? 15 : media.width * 0.05),
 
                 // ✅ استبدلنا RoundTextField بالويدجت المخصص الجديد
                 Row(
@@ -252,6 +332,40 @@ class _SignUpViewState extends State<SignUpView> {
                     title: "Sign Up",
                     onPressed: _signUp,
                   ),
+                SizedBox(height: media.width * 0.04),
+                const Text(
+                  "Or",
+                  style: TextStyle(color: Colors.grey, fontSize: 14),
+                ),
+                SizedBox(height: media.width * 0.04),
+                GoogleSignInButton(
+                  onPressed: _handleGoogleSignIn,
+                ),
+                SizedBox(height: media.width * 0.04),
+                // Back to login link
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.arrow_back_ios,
+                        size: 14,
+                        color: TColor.gray,
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        "Back to Login",
+                        style: TextStyle(
+                          color: TColor.gray,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),

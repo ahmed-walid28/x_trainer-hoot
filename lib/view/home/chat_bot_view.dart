@@ -97,6 +97,23 @@ class _ChatBotViewState extends State<ChatBotView> {
     }
   }
 
+  // Scroll to bottom of chat
+  void _scrollToBottom({bool animated = true}) {
+    if (_chatScrollController.hasClients) {
+      if (animated) {
+        _chatScrollController.animateTo(
+          _chatScrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      } else {
+        _chatScrollController.jumpTo(
+          _chatScrollController.position.maxScrollExtent,
+        );
+      }
+    }
+  }
+
   // Check if user is ending session
   bool _isSessionEnding(String text) {
     final endKeywords = [

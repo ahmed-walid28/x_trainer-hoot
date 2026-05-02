@@ -1,9 +1,17 @@
 import 'dart:math' as math;
-import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
-import 'package:speech_to_text/speech_to_text.dart' as stt;
-import 'package:http/http.dart' as http;
+import 'dart:typed_data';
 import 'dart:convert';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
+
 import '../../models/fitness_memory.dart';
 
 class ChatBotView extends StatefulWidget {
@@ -14,7 +22,12 @@ class ChatBotView extends StatefulWidget {
 }
 
 class _ChatBotViewState extends State<ChatBotView> {
+  static const String _chatServerOverride =
+      String.fromEnvironment('CHAT_SERVER_URL', defaultValue: '');
+
   final TextEditingController _messageController = TextEditingController();
+  final ScrollController _chatScrollController = ScrollController();
+  final ImagePicker _imagePicker = ImagePicker();
   late stt.SpeechToText _speech;
 
   bool _isListening = false;
@@ -25,6 +38,7 @@ class _ChatBotViewState extends State<ChatBotView> {
 
   String? selectedFileName;
   bool isImageSelected = false;
+  _AttachmentData? _pendingAttachment;
 
   final List<_ChatMessage> _messages = [];
 
@@ -33,7 +47,6 @@ class _ChatBotViewState extends State<ChatBotView> {
 
   // AI Coach Fitness Memory
   FitnessMemory _fitnessMemory = FitnessMemory();
-  bool _profileLoaded = false;
 
   @override
   void initState() {
@@ -50,21 +63,19 @@ class _ChatBotViewState extends State<ChatBotView> {
       if (!kIsWeb) {
         _fitnessMemory = await FitnessMemory.load();
       }
-      setState(() {
-        _profileLoaded = true;
-      });
-      
+
       // If we have a complete profile, show welcome back message
       if (_fitnessMemory.isProfileComplete) {
-        final welcomeMsg = _fitnessMemory.name != null 
+        final welcomeMsg = _fitnessMemory.name != null
             ? 'أهلاً ${_fitnessMemory.name}! هدفك الحالي هو ${_fitnessMemory.goal} وهدف السعرات: ${_fitnessMemory.calculatedTargetKcal?.round()} kcal/day. إيه اللي تحب تعمله النهارده؟'
             : 'Welcome back! Goal: ${_fitnessMemory.goal}, Target: ${_fitnessMemory.calculatedTargetKcal?.round()} kcal/day. What would you like to do?';
-        
+
         setState(() {
           _messages.add(_ChatMessage(text: welcomeMsg, isUser: false));
           _showIntroSection = false;
           _showBackToHomeInChat = true;
         });
+        _scrollToBottom(animated: false);
       }
     } catch (e) {
       debugPrint('Error loading fitness memory: $e');
@@ -78,8 +89,8 @@ class _ChatBotViewState extends State<ChatBotView> {
       if (!kIsWeb) {
         await _fitnessMemory.save();
       }
-      _showSnack(_fitnessMemory.name != null 
-          ? 'تم حفظ بياناتك! 💪' 
+      _showSnack(_fitnessMemory.name != null
+          ? 'تم حفظ بياناتك! 💪'
           : 'Your profile has been saved! 💪');
     } catch (e) {
       debugPrint('Error saving fitness memory: $e');
@@ -89,12 +100,48 @@ class _ChatBotViewState extends State<ChatBotView> {
   // Check if user is ending session
   bool _isSessionEnding(String text) {
     final endKeywords = [
-      'bye', 'goodbye', 'thanks', 'thank you', 'see you',
-      'مع السلامة', 'شكراً', 'شكرا', 'باي', 'سلام',
-      'talk later', 'later', 'see ya', 'مشي', 'خروج'
+      'bye',
+      'goodbye',
+      'thanks',
+      'thank you',
+      'see you',
+      'مع السلامة',
+      'شكراً',
+      'شكرا',
+      'باي',
+      'سلام',
+      'talk later',
+      'later',
+      'see ya',
+      'مشي',
+      'خروج'
     ];
     final lowerText = text.toLowerCase();
     return endKeywords.any((keyword) => lowerText.contains(keyword));
+  }
+
+  List<String> _chatBaseUrls() {
+    if (_chatServerOverride.isNotEmpty) {
+      return <String>[_chatServerOverride];
+    }
+
+    if (kIsWeb) {
+      return <String>['http://localhost:5001'];
+    }
+
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      // Android emulator maps host localhost to 10.0.2.2
+      return <String>[
+        'http://10.0.2.2:5001',
+        'http://127.0.0.1:5001',
+        'http://localhost:5001',
+      ];
+    }
+
+    return <String>[
+      'http://localhost:5001',
+      'http://127.0.0.1:5001',
+    ];
   }
 
   Future<void> _initSpeech() async {
@@ -131,8 +178,8 @@ class _ChatBotViewState extends State<ChatBotView> {
       chosenLocale ??= _locales.any((l) => l.localeId == 'ar_EG')
           ? 'ar_EG'
           : _locales.any((l) => l.localeId == 'en_US')
-          ? 'en_US'
-          : (_locales.isNotEmpty ? _locales.first.localeId : null);
+              ? 'en_US'
+              : (_locales.isNotEmpty ? _locales.first.localeId : null);
 
       _currentLocaleId = chosenLocale;
     }
@@ -143,6 +190,185 @@ class _ChatBotViewState extends State<ChatBotView> {
   }
 
   void _showSnack(String text) {
+
+      void _scrollToBottom({bool animated = true}) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!_chatScrollController.hasClients) return;
+          final target = _chatScrollController.position.maxScrollExtent + 80;
+          if (animated) {
+            _chatScrollController.animateTo(
+              target,
+              duration: const Duration(milliseconds: 280),
+              curve: Curves.easeOut,
+            );
+          } else {
+            _chatScrollController.jumpTo(target);
+          }
+        });
+      }
+
+      String _guessContentType(String fileName, {required bool isImage}) {
+        final lower = fileName.toLowerCase();
+        if (isImage) {
+          if (lower.endsWith('.png')) return 'image/png';
+          if (lower.endsWith('.webp')) return 'image/webp';
+          return 'image/jpeg';
+        }
+        if (lower.endsWith('.pdf')) return 'application/pdf';
+        if (lower.endsWith('.txt')) return 'text/plain';
+        if (lower.endsWith('.doc')) return 'application/msword';
+        if (lower.endsWith('.docx')) {
+          return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+        }
+        return 'application/octet-stream';
+      }
+
+      Future<String?> _uploadAttachmentBytes({
+        required Uint8List bytes,
+        required String fileName,
+        required String contentType,
+      }) async {
+        try {
+          final user = FirebaseAuth.instance.currentUser;
+          final owner = user?.uid ?? 'anonymous';
+          final safeName = fileName.replaceAll(RegExp(r'[^a-zA-Z0-9._-]'), '_');
+          final ref = FirebaseStorage.instance
+              .ref()
+              .child('chat_attachments')
+              .child(owner)
+              .child('${DateTime.now().millisecondsSinceEpoch}_$safeName');
+
+          await ref.putData(
+            bytes,
+            SettableMetadata(contentType: contentType),
+          );
+          return await ref.getDownloadURL();
+        } catch (e) {
+          debugPrint('Attachment upload failed: $e');
+          return null;
+        }
+      }
+
+      Future<void> _pickFromCamera() async {
+        final picked = await _imagePicker.pickImage(
+          source: ImageSource.camera,
+          imageQuality: 80,
+          maxWidth: 1920,
+        );
+        if (picked == null) return;
+
+        final bytes = await picked.readAsBytes();
+        final fileName = picked.name.isNotEmpty ? picked.name : 'camera_photo.jpg';
+        final contentType = _guessContentType(fileName, isImage: true);
+        final remoteUrl = await _uploadAttachmentBytes(
+          bytes: bytes,
+          fileName: fileName,
+          contentType: contentType,
+        );
+
+        setState(() {
+          selectedFileName = fileName;
+          isImageSelected = true;
+          _pendingAttachment = _AttachmentData(
+            fileName: fileName,
+            type: 'image',
+            contentType: contentType,
+            sizeBytes: bytes.length,
+            remoteUrl: remoteUrl,
+          );
+        });
+        _showSnack('Photo attached successfully');
+      }
+
+      Future<void> _pickImageFromGallery() async {
+        final picked = await _imagePicker.pickImage(
+          source: ImageSource.gallery,
+          imageQuality: 85,
+          maxWidth: 2048,
+        );
+        if (picked == null) return;
+
+        final bytes = await picked.readAsBytes();
+        final fileName = picked.name.isNotEmpty ? picked.name : 'selected_image.jpg';
+        final contentType = _guessContentType(fileName, isImage: true);
+        final remoteUrl = await _uploadAttachmentBytes(
+          bytes: bytes,
+          fileName: fileName,
+          contentType: contentType,
+        );
+
+        setState(() {
+          selectedFileName = fileName;
+          isImageSelected = true;
+          _pendingAttachment = _AttachmentData(
+            fileName: fileName,
+            type: 'image',
+            contentType: contentType,
+            sizeBytes: bytes.length,
+            remoteUrl: remoteUrl,
+          );
+        });
+        _showSnack('Image attached successfully');
+      }
+
+      Future<void> _pickFileAttachment() async {
+        final result = await FilePicker.platform.pickFiles(
+          type: FileType.any,
+          allowMultiple: false,
+          withData: true,
+        );
+        if (result == null || result.files.isEmpty) return;
+
+        final file = result.files.single;
+        if (file.bytes == null) {
+          _showSnack('Could not read selected file bytes');
+          return;
+        }
+
+        final fileName = file.name;
+        final bytes = file.bytes!;
+        final contentType = _guessContentType(fileName, isImage: false);
+        final remoteUrl = await _uploadAttachmentBytes(
+          bytes: bytes,
+          fileName: fileName,
+          contentType: contentType,
+        );
+
+        setState(() {
+          selectedFileName = fileName;
+          isImageSelected = false;
+          _pendingAttachment = _AttachmentData(
+            fileName: fileName,
+            type: 'file',
+            contentType: contentType,
+            sizeBytes: bytes.length,
+            remoteUrl: remoteUrl,
+          );
+        });
+        _showSnack('File attached successfully');
+      }
+
+      Future<void> _persistChatMessage(
+        _ChatMessage message, {
+        _AttachmentData? attachment,
+      }) async {
+        try {
+          final user = FirebaseAuth.instance.currentUser;
+          final owner = user?.uid ?? 'anonymous';
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(owner)
+              .collection('ai_chat_messages')
+              .add({
+            'text': message.text,
+            'isUser': message.isUser,
+            'attachment': attachment?.toDbMap(),
+            'createdAt': FieldValue.serverTimestamp(),
+          });
+        } catch (e) {
+          debugPrint('Persist chat message failed: $e');
+        }
+      }
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(text),
@@ -180,11 +406,7 @@ class _ChatBotViewState extends State<ChatBotView> {
                 title: "Take Photo",
                 onTap: () {
                   Navigator.pop(context);
-                  setState(() {
-                    selectedFileName = "camera_photo.jpg";
-                    isImageSelected = true;
-                  });
-                  _showSnack("Camera action ready");
+                  _pickFromCamera();
                 },
               ),
               _optionTile(
@@ -192,11 +414,7 @@ class _ChatBotViewState extends State<ChatBotView> {
                 title: "Upload Image",
                 onTap: () {
                   Navigator.pop(context);
-                  setState(() {
-                    selectedFileName = "selected_image.png";
-                    isImageSelected = true;
-                  });
-                  _showSnack("Upload image action ready");
+                  _pickImageFromGallery();
                 },
               ),
               _optionTile(
@@ -204,11 +422,7 @@ class _ChatBotViewState extends State<ChatBotView> {
                 title: "Upload File",
                 onTap: () {
                   Navigator.pop(context);
-                  setState(() {
-                    selectedFileName = "attached_file.pdf";
-                    isImageSelected = false;
-                  });
-                  _showSnack("Upload file action ready");
+                  _pickFileAttachment();
                 },
               ),
             ],
@@ -326,10 +540,10 @@ class _ChatBotViewState extends State<ChatBotView> {
   }
 
   Widget _buildActionChip(
-      IconData icon,
-      String text, {
-        required VoidCallback onTap,
-      }) {
+    IconData icon,
+    String text, {
+    required VoidCallback onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -488,51 +702,91 @@ class _ChatBotViewState extends State<ChatBotView> {
   // --- AI Coach Chat Endpoint ---
   Future<void> _sendMessage() async {
     final text = _messageController.text.trim();
-    if (text.isEmpty) return;
+    final attachment = _pendingAttachment;
+    if (text.isEmpty && attachment == null) return;
+
+    final userText = text.isNotEmpty
+        ? text
+        : (attachment!.type == 'image'
+            ? 'Sent an image: ${attachment.fileName}'
+            : 'Sent a file: ${attachment.fileName}');
 
     // Extract profile data from message
-    _fitnessMemory.updateFromMessage(text);
-    
+    _fitnessMemory.updateFromMessage(userText);
+
     // Check if session is ending
-    final isEnding = _isSessionEnding(text);
+    final isEnding = _isSessionEnding(userText);
+
+    final userMessage = _ChatMessage(
+      text: userText,
+      isUser: true,
+      attachment: attachment,
+    );
 
     setState(() {
-      _messages.add(_ChatMessage(text: text, isUser: true));
+      _messages.add(userMessage);
       _showIntroSection = false;
       _showBackToHomeInChat = true;
       _isLoading = true;
       _messageController.clear();
+      selectedFileName = null;
+      isImageSelected = false;
+      _pendingAttachment = null;
     });
+    _scrollToBottom();
+    await _persistChatMessage(userMessage, attachment: attachment);
 
     try {
       // Prepare conversation history
-      final history = _messages.map((m) => {
-        'text': m.text,
-        'is_user': m.isUser,
-      }).toList();
+      final history = _messages
+          .map((m) => {
+                'text': m.text,
+                'is_user': m.isUser,
+                'attachment': m.attachment?.toBackendJson(),
+              })
+          .toList();
 
-      // AI Coach endpoint - use localhost for Web, IP for mobile
-      final serverUrl = kIsWeb 
-          ? 'http://localhost:5000/chat' 
-          : 'http://10.194.217.7:5000/chat';
-      final url = Uri.parse(serverUrl);
-      
-      final response = await http.post(
-        url,
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-          "question": text,
-          "profile": _fitnessMemory.toJson(),
-          "history": history,
-        }),
-      ).timeout(const Duration(minutes: 2));
+        // AI Coach endpoint - Groq server with retry over candidate URLs
+        final baseUrls = _chatBaseUrls();
+        http.Response? response;
+        Object? lastConnectionError;
+
+        for (final baseUrl in baseUrls) {
+          try {
+            final url = Uri.parse('$baseUrl/chat');
+            response = await http
+                .post(
+                  url,
+                  headers: {"Content-Type": "application/json"},
+                  body: jsonEncode({
+                    "question": userText,
+                    "profile": _fitnessMemory.toJson(),
+                    "history": history,
+                    "attachment": attachment?.toBackendJson(),
+                  }),
+                )
+                .timeout(const Duration(seconds: 20));
+            break;
+          } catch (e) {
+            lastConnectionError = e;
+          }
+        }
+
+        if (response == null) {
+          throw Exception(
+            'Connection failed for all endpoints: ${baseUrls.join(', ')} | $lastConnectionError',
+          );
+        }
 
       if (response.statusCode == 200) {
         final data = jsonDecode(utf8.decode(response.bodyBytes));
+        final assistantMessage = _ChatMessage(text: data['answer'], isUser: false);
         setState(() {
-          _messages.add(_ChatMessage(text: data['answer'], isUser: false));
+          _messages.add(assistantMessage);
         });
-        
+        _scrollToBottom();
+        await _persistChatMessage(assistantMessage);
+
         // If session ended, save profile
         if (isEnding || data['session_ended'] == true) {
           await _saveFitnessMemory();
@@ -541,14 +795,17 @@ class _ChatBotViewState extends State<ChatBotView> {
         _showSnack("Error: ${response.statusCode}");
       }
     } catch (e) {
+      final attempted = _chatBaseUrls().join(', ');
       _showSnack("Connection failed! Check Python server.");
       // Fallback: simple local response
       setState(() {
         _messages.add(_ChatMessage(
-          text: "Sorry, I can't connect to the AI server. Please make sure the Python server is running at ${kIsWeb ? 'http://localhost:5000' : 'http://10.194.217.7:5000'}",
+          text:
+              "Sorry, I can't connect to the AI server. Please make sure the Groq server is running:\ncd models && python ai_server_groq.py\n\nTried endpoints:\n$attempted\n\nIf needed, override endpoint:\nflutter run --dart-define=CHAT_SERVER_URL=http://YOUR_IP:5001",
           isUser: false,
         ));
       });
+      _scrollToBottom();
     } finally {
       if (mounted) {
         setState(() {
@@ -576,14 +833,14 @@ class _ChatBotViewState extends State<ChatBotView> {
           ),
           gradient: isUser
               ? const LinearGradient(
-            colors: [
-              Color(0xffF2A8D7),
-              Color(0xffA389FF),
-              Color(0xff8EBBFF),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          )
+                  colors: [
+                    Color(0xffF2A8D7),
+                    Color(0xffA389FF),
+                    Color(0xff8EBBFF),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                )
               : null,
           color: isUser ? null : Colors.white.withOpacity(0.82),
           border: Border.all(
@@ -599,14 +856,51 @@ class _ChatBotViewState extends State<ChatBotView> {
             ),
           ],
         ),
-        child: Text(
-          message.text,
-          style: TextStyle(
-            color: isUser ? Colors.white : const Color(0xff5A4A86),
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            height: 1.3,
-          ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              message.text,
+              style: TextStyle(
+                color: isUser ? Colors.white : const Color(0xff5A4A86),
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                height: 1.3,
+              ),
+            ),
+            if (message.attachment != null) ...[
+              const SizedBox(height: 8),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    message.attachment!.type == 'image'
+                        ? Icons.image_rounded
+                        : Icons.attach_file_rounded,
+                    size: 14,
+                    color: isUser
+                        ? Colors.white.withOpacity(0.95)
+                        : const Color(0xff7A6AAE),
+                  ),
+                  const SizedBox(width: 6),
+                  Flexible(
+                    child: Text(
+                      message.attachment!.fileName,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: isUser
+                            ? Colors.white.withOpacity(0.95)
+                            : const Color(0xff7A6AAE),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ],
         ),
       ),
     );
@@ -615,6 +909,7 @@ class _ChatBotViewState extends State<ChatBotView> {
   @override
   void dispose() {
     _speech.stop();
+    _chatScrollController.dispose();
     _messageController.dispose();
     super.dispose();
   }
@@ -689,7 +984,8 @@ class _ChatBotViewState extends State<ChatBotView> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   child: Column(
                     children: [
                       Row(
@@ -697,13 +993,13 @@ class _ChatBotViewState extends State<ChatBotView> {
                           _showBackToHomeInChat
                               ? _buildTopBackButton()
                               : GestureDetector(
-                            onTap: () => Navigator.pop(context),
-                            child: const Icon(
-                              Icons.arrow_back_ios_new_rounded,
-                              size: 19,
-                              color: Color(0xff6A5B93),
-                            ),
-                          ),
+                                  onTap: () => Navigator.pop(context),
+                                  child: const Icon(
+                                    Icons.arrow_back_ios_new_rounded,
+                                    size: 19,
+                                    color: Color(0xff6A5B93),
+                                  ),
+                                ),
                           const Spacer(),
                           Container(
                             padding: const EdgeInsets.symmetric(
@@ -715,14 +1011,15 @@ class _ChatBotViewState extends State<ChatBotView> {
                               borderRadius: BorderRadius.circular(20),
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(0xffCAB3FF).withOpacity(0.16),
+                                  color:
+                                      const Color(0xffCAB3FF).withOpacity(0.16),
                                   blurRadius: 12,
                                   offset: const Offset(0, 4),
                                 ),
                               ],
                             ),
-                            child: Row(
-                              children: const [
+                            child: const Row(
+                              children: [
                                 Icon(
                                   Icons.circle,
                                   size: 7,
@@ -762,94 +1059,157 @@ class _ChatBotViewState extends State<ChatBotView> {
                       Expanded(
                         child: _messages.isEmpty && _showIntroSection
                             ? Column(
-                          children: [
-                            const Spacer(),
-                            _buildDotRing(),
-                            const Spacer(),
-                            Wrap(
-                              spacing: 10,
-                              runSpacing: 10,
-                              alignment: WrapAlignment.center,
-                              children: [
-                                _buildActionChip(
-                                  Icons.fitness_center_rounded,
-                                  "Suggest Workout",
-                                  onTap: () => _fillQuickPrompt("Suggest Workout"),
-                                ),
-                                _buildActionChip(
-                                  Icons.edit_calendar_rounded,
-                                  "Create Plan",
-                                  onTap: () => _fillQuickPrompt("Create Plan"),
-                                ),
-                                _buildActionChip(
-                                  Icons.show_chart_rounded,
-                                  "Track Progress",
-                                  onTap: () => _fillQuickPrompt("Track Progress"),
-                                ),
-                                _buildActionChip(
-                                  Icons.restaurant_menu_rounded,
-                                  "Nutrition Tips",
-                                  onTap: () => _fillQuickPrompt("Nutrition Tips"),
-                                ),
-                              ],
-                            ),
-                            if (selectedFileName != null) ...[
-                              const SizedBox(height: 12),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 8,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.76),
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      isImageSelected
-                                          ? Icons.image_rounded
-                                          : Icons.attach_file_rounded,
-                                      size: 16,
-                                      color: const Color(0xff9B86F4),
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Flexible(
-                                      child: Text(
-                                        selectedFileName!,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                          color: Color(0xff8E7AB7),
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500,
-                                        ),
+                                children: [
+                                  const Spacer(),
+                                  _buildDotRing(),
+                                  const Spacer(),
+                                  Wrap(
+                                    spacing: 10,
+                                    runSpacing: 10,
+                                    alignment: WrapAlignment.center,
+                                    children: [
+                                      _buildActionChip(
+                                        Icons.fitness_center_rounded,
+                                        "Suggest Workout",
+                                        onTap: () =>
+                                            _fillQuickPrompt("Suggest Workout"),
+                                      ),
+                                      _buildActionChip(
+                                        Icons.edit_calendar_rounded,
+                                        "Create Plan",
+                                        onTap: () =>
+                                            _fillQuickPrompt("Create Plan"),
+                                      ),
+                                      _buildActionChip(
+                                        Icons.show_chart_rounded,
+                                        "Track Progress",
+                                        onTap: () =>
+                                            _fillQuickPrompt("Track Progress"),
+                                      ),
+                                      _buildActionChip(
+                                        Icons.restaurant_menu_rounded,
+                                        "Nutrition Tips",
+                                        onTap: () =>
+                                            _fillQuickPrompt("Nutrition Tips"),
+                                      ),
+                                    ],
+                                  ),
+                                  if (selectedFileName != null) ...[
+                                    const SizedBox(height: 12),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 8,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(0.76),
+                                        borderRadius: BorderRadius.circular(14),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(
+                                            isImageSelected
+                                                ? Icons.image_rounded
+                                                : Icons.attach_file_rounded,
+                                            size: 16,
+                                            color: const Color(0xff9B86F4),
+                                          ),
+                                          const SizedBox(width: 6),
+                                          Flexible(
+                                            child: Text(
+                                              selectedFileName!,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: const TextStyle(
+                                                color: Color(0xff8E7AB7),
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ],
+                                  const SizedBox(height: 8),
+                                ],
+                              )
+                            : ListView.builder(
+                                controller: _chatScrollController,
+                                padding: const EdgeInsets.only(top: 8),
+                                itemCount:
+                                    _messages.length + (_isLoading ? 1 : 0),
+                                itemBuilder: (context, index) {
+                                  if (index == _messages.length) {
+                                    return const Padding(
+                                      padding: EdgeInsets.all(12),
+                                      child: Center(
+                                        child: CircularProgressIndicator(
+                                            color: Color(0xff9B86F4)),
+                                      ),
+                                    );
+                                  }
+                                  return _buildMessageBubble(_messages[index]);
+                                },
+                              ),
+                      ),
+                      if (selectedFileName != null) ...[
+                        const SizedBox(height: 8),
+                        Container(
+                          width: double.infinity,
+                          margin: const EdgeInsets.symmetric(horizontal: 6),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.86),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: const Color(0xffE8DFFF),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                isImageSelected
+                                    ? Icons.image_rounded
+                                    : Icons.attach_file_rounded,
+                                size: 16,
+                                color: const Color(0xff8F7CF5),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  selectedFileName!,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: Color(0xff6B5A95),
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    selectedFileName = null;
+                                    isImageSelected = false;
+                                    _pendingAttachment = null;
+                                  });
+                                },
+                                child: const Icon(
+                                  Icons.close_rounded,
+                                  size: 18,
+                                  color: Color(0xff8F7CF5),
                                 ),
                               ),
                             ],
-                            const SizedBox(height: 8),
-                          ],
-                        )
-                            : ListView.builder(
-                          padding: const EdgeInsets.only(top: 8),
-                          itemCount: _messages.length + (_isLoading ? 1 : 0),
-                          itemBuilder: (context, index) {
-                            if (index == _messages.length) {
-                              return const Padding(
-                                padding: EdgeInsets.all(12),
-                                child: Center(
-                                  child: CircularProgressIndicator(color: Color(0xff9B86F4)),
-                                ),
-                              );
-                            }
-                            return _buildMessageBubble(_messages[index]);
-                          },
+                          ),
                         ),
-                      ),
+                      ],
                       const SizedBox(height: 12),
                       Container(
                         padding: const EdgeInsets.symmetric(
@@ -892,6 +1252,9 @@ class _ChatBotViewState extends State<ChatBotView> {
                             Expanded(
                               child: TextField(
                                 controller: _messageController,
+                                minLines: 1,
+                                maxLines: 4,
+                                textInputAction: TextInputAction.newline,
                                 decoration: const InputDecoration(
                                   hintText: "Write here...",
                                   hintStyle: TextStyle(
@@ -900,7 +1263,6 @@ class _ChatBotViewState extends State<ChatBotView> {
                                   ),
                                   border: InputBorder.none,
                                 ),
-                                onSubmitted: (_) => _sendMessage(),
                               ),
                             ),
                             GestureDetector(
@@ -923,16 +1285,19 @@ class _ChatBotViewState extends State<ChatBotView> {
                                   ),
                                   boxShadow: _isListening
                                       ? [
-                                    BoxShadow(
-                                      color: const Color(0xffC687F8).withOpacity(0.22),
-                                      blurRadius: 12,
-                                      spreadRadius: 1,
-                                    ),
-                                  ]
+                                          BoxShadow(
+                                            color: const Color(0xffC687F8)
+                                                .withOpacity(0.22),
+                                            blurRadius: 12,
+                                            spreadRadius: 1,
+                                          ),
+                                        ]
                                       : [],
                                 ),
                                 child: Icon(
-                                  _isListening ? Icons.mic : Icons.mic_none_rounded,
+                                  _isListening
+                                      ? Icons.mic
+                                      : Icons.mic_none_rounded,
                                   color: const Color(0xff8B73F7),
                                   size: 20,
                                 ),
@@ -1070,9 +1435,47 @@ class DotRingPainter extends CustomPainter {
 class _ChatMessage {
   final String text;
   final bool isUser;
+  final _AttachmentData? attachment;
 
   _ChatMessage({
     required this.text,
     required this.isUser,
+    this.attachment,
   });
+}
+
+class _AttachmentData {
+  final String fileName;
+  final String type;
+  final String contentType;
+  final int sizeBytes;
+  final String? remoteUrl;
+
+  _AttachmentData({
+    required this.fileName,
+    required this.type,
+    required this.contentType,
+    required this.sizeBytes,
+    this.remoteUrl,
+  });
+
+  Map<String, dynamic> toBackendJson() {
+    return {
+      'file_name': fileName,
+      'type': type,
+      'content_type': contentType,
+      'size_bytes': sizeBytes,
+      'remote_url': remoteUrl,
+    };
+  }
+
+  Map<String, dynamic> toDbMap() {
+    return {
+      'fileName': fileName,
+      'type': type,
+      'contentType': contentType,
+      'sizeBytes': sizeBytes,
+      'remoteUrl': remoteUrl,
+    };
+  }
 }

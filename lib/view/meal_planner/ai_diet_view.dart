@@ -21,7 +21,7 @@ class _AiDietViewState extends State<AiDietView> {
 
   // إضافات جديدة عشان توافق الموديل بتاعك
   bool hasHypertension = false; // الضغط
-  bool hasDiabetes = false;     // السكر
+  bool hasDiabetes = false; // السكر
 
   String resultPlan = "";
   bool isLoading = false;
@@ -43,8 +43,12 @@ class _AiDietViewState extends State<AiDietView> {
   }
 
   Future<void> getDietPlan() async {
-    if (_ageController.text.isEmpty || _heightController.text.isEmpty || _weightController.text.isEmpty) {
-      setState(() { resultPlan = "Please fill all fields"; });
+    if (_ageController.text.isEmpty ||
+        _heightController.text.isEmpty ||
+        _weightController.text.isEmpty) {
+      setState(() {
+        resultPlan = "Please fill all fields";
+      });
       return;
     }
 
@@ -74,8 +78,8 @@ class _AiDietViewState extends State<AiDietView> {
           "Weight": weight,
           "Hypertension": hasHypertension ? 1 : 0,
           "Diabetes": hasDiabetes ? 1 : 0,
-          "BMI": bmi,           // محسوب أوتوماتيك
-          "Level": level,       // محسوب أوتوماتيك
+          "BMI": bmi, // محسوب أوتوماتيك
+          "Level": level, // محسوب أوتوماتيك
           "Fitness Goal": selectedGoal
         }),
       );
@@ -106,7 +110,11 @@ class _AiDietViewState extends State<AiDietView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("AI Diet Consultant", style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.w700)),
+        title: const Text("AI Diet Consultant",
+            style: TextStyle(
+                color: Colors.black,
+                fontSize: 16,
+                fontWeight: FontWeight.w700)),
         backgroundColor: Colors.white,
         elevation: 1,
         iconTheme: const IconThemeData(color: Colors.black),
@@ -117,7 +125,11 @@ class _AiDietViewState extends State<AiDietView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("Enter your details:", style: TextStyle(fontSize: 16, color: Colors.grey, fontWeight: FontWeight.bold)),
+            const Text("Enter your details:",
+                style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey,
+                    fontWeight: FontWeight.bold)),
             const SizedBox(height: 20),
 
             _buildSimpleTextField("Age", _ageController, "e.g. 25"),
@@ -125,30 +137,41 @@ class _AiDietViewState extends State<AiDietView> {
 
             Row(
               children: [
-                Expanded(child: _buildSimpleTextField("Height (cm)", _heightController, "175")),
+                Expanded(
+                    child: _buildSimpleTextField(
+                        "Height (cm)", _heightController, "175")),
                 const SizedBox(width: 15),
-                Expanded(child: _buildSimpleTextField("Weight (kg)", _weightController, "75")),
+                Expanded(
+                    child: _buildSimpleTextField(
+                        "Weight (kg)", _weightController, "75")),
               ],
             ),
             const SizedBox(height: 15),
 
-            _buildSimpleDropdown("Gender", ["Male", "Female"], selectedGender, (val) => setState(() => selectedGender = val!)),
+            _buildSimpleDropdown("Gender", ["Male", "Female"], selectedGender,
+                (val) => setState(() => selectedGender = val!)),
             const SizedBox(height: 15),
-            _buildSimpleDropdown("Fitness Goal", ["Weight Loss", "Weight Gain", "Healthy"], selectedGoal, (val) => setState(() => selectedGoal = val!)),
+            _buildSimpleDropdown(
+                "Fitness Goal",
+                ["Weight Loss", "Weight Gain", "Healthy"],
+                selectedGoal,
+                (val) => setState(() => selectedGoal = val!)),
 
             const SizedBox(height: 20),
 
             // أسئلة الضغط والسكر (إضافة جديدة)
             SwitchListTile(
-              title: const Text("Do you have Hypertension?", style: TextStyle(fontWeight: FontWeight.bold)),
+              title: const Text("Do you have Hypertension?",
+                  style: TextStyle(fontWeight: FontWeight.bold)),
               value: hasHypertension,
-              activeColor: TColor.primaryColor1,
+              activeThumbColor: TColor.primaryColor1,
               onChanged: (val) => setState(() => hasHypertension = val),
             ),
             SwitchListTile(
-              title: const Text("Do you have Diabetes?", style: TextStyle(fontWeight: FontWeight.bold)),
+              title: const Text("Do you have Diabetes?",
+                  style: TextStyle(fontWeight: FontWeight.bold)),
               value: hasDiabetes,
-              activeColor: TColor.primaryColor1,
+              activeThumbColor: TColor.primaryColor1,
               onChanged: (val) => setState(() => hasDiabetes = val),
             ),
 
@@ -161,11 +184,16 @@ class _AiDietViewState extends State<AiDietView> {
                 onPressed: isLoading ? null : getDietPlan,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: TColor.primaryColor1,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25)),
                 ),
                 child: isLoading
                     ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text("Generate Plan", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                    : const Text("Generate Plan",
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white)),
               ),
             ),
 
@@ -178,14 +206,19 @@ class _AiDietViewState extends State<AiDietView> {
                 decoration: BoxDecoration(
                     color: Colors.blue.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(15),
-                    border: Border.all(color: TColor.primaryColor1)
-                ),
+                    border: Border.all(color: TColor.primaryColor1)),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Recommended Plan:", style: TextStyle(color: TColor.primaryColor1, fontWeight: FontWeight.bold, fontSize: 18)),
+                    Text("Recommended Plan:",
+                        style: TextStyle(
+                            color: TColor.primaryColor1,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18)),
                     const SizedBox(height: 10),
-                    Text(resultPlan, style: const TextStyle(fontSize: 16, height: 1.5, color: Colors.black87)),
+                    Text(resultPlan,
+                        style: const TextStyle(
+                            fontSize: 16, height: 1.5, color: Colors.black87)),
                   ],
                 ),
               )
@@ -195,11 +228,13 @@ class _AiDietViewState extends State<AiDietView> {
     );
   }
 
-  Widget _buildSimpleTextField(String label, TextEditingController controller, String hint) {
+  Widget _buildSimpleTextField(
+      String label, TextEditingController controller, String hint) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+        Text(label,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
         const SizedBox(height: 5),
         TextField(
           controller: controller,
@@ -207,18 +242,21 @@ class _AiDietViewState extends State<AiDietView> {
           decoration: InputDecoration(
             hintText: hint,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildSimpleDropdown(String label, List<String> items, String currentVal, Function(String?) onChanged) {
+  Widget _buildSimpleDropdown(String label, List<String> items,
+      String currentVal, Function(String?) onChanged) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+        Text(label,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
         const SizedBox(height: 5),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -230,7 +268,9 @@ class _AiDietViewState extends State<AiDietView> {
             child: DropdownButton<String>(
               isExpanded: true,
               value: currentVal,
-              items: items.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+              items: items
+                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                  .toList(),
               onChanged: onChanged,
             ),
           ),

@@ -63,8 +63,9 @@ class _TodaySleepScheduleRowState extends State<TodaySleepScheduleRow> {
                       ),
                     ],
                   ),
-
-                  const SizedBox(height: 8,),
+                  const SizedBox(
+                    height: 8,
+                  ),
                   Text(
                     widget.sObj["duration"].toString(),
                     style: TextStyle(
@@ -96,7 +97,7 @@ class _TodaySleepScheduleRowState extends State<TodaySleepScheduleRow> {
                     scale: 0.7,
                     child: CustomAnimatedToggleSwitch<bool>(
                       current: positive,
-                      values: [false, true],
+                      values: const [false, true],
                       dif: 0.0,
                       indicatorSize: const Size.square(30.0),
                       animationDuration: const Duration(milliseconds: 200),

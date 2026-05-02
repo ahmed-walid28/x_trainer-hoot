@@ -223,7 +223,8 @@ class _EditProfileViewState extends State<EditProfileView> {
         actions: [
           IconButton(
             onPressed: () async {
-              final profile = Provider.of<ProfileProvider>(context, listen: false);
+              final profile =
+                  Provider.of<ProfileProvider>(context, listen: false);
               await profile.signOut();
               if (!mounted) return;
               Navigator.pushNamedAndRemoveUntil(
@@ -239,7 +240,8 @@ class _EditProfileViewState extends State<EditProfileView> {
       backgroundColor: TColor.white,
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.only(left: 20, right: 20, top: 25, bottom: 15),
+          padding:
+              const EdgeInsets.only(left: 20, right: 20, top: 25, bottom: 15),
           child: Column(
             children: [
               const SizedBox(height: 10),
@@ -311,7 +313,8 @@ class _EditProfileViewState extends State<EditProfileView> {
                       height: 100,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(50),
-                        border: Border.all(color: TColor.primaryColor1, width: 2),
+                        border:
+                            Border.all(color: TColor.primaryColor1, width: 2),
                       ),
                       child: Stack(
                         children: [
@@ -342,7 +345,7 @@ class _EditProfileViewState extends State<EditProfileView> {
                   },
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
 
               // Personal Information
               RoundTextField(
@@ -350,20 +353,20 @@ class _EditProfileViewState extends State<EditProfileView> {
                 hitText: "First Name",
                 icon: "assets/img/user_text.png",
               ),
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
               RoundTextField(
                 controller: txtLastName,
                 hitText: "Last Name",
                 icon: "assets/img/user_text.png",
               ),
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
               RoundTextField(
                 controller: txtEmail,
                 hitText: "Email",
                 icon: "assets/img/email.png",
                 keyboardType: TextInputType.emailAddress,
               ),
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
 
               // Gender Selection
               Container(
@@ -394,15 +397,15 @@ class _EditProfileViewState extends State<EditProfileView> {
                           ),
                           items: ["Male", "Female"]
                               .map((gender) => DropdownMenuItem(
-                            value: gender,
-                            child: Text(
-                              gender,
-                              style: TextStyle(
-                                color: TColor.black,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ))
+                                    value: gender,
+                                    child: Text(
+                                      gender,
+                                      style: TextStyle(
+                                        color: TColor.black,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ))
                               .toList(),
                           onChanged: (value) {
                             setState(() {
@@ -416,7 +419,7 @@ class _EditProfileViewState extends State<EditProfileView> {
                   ],
                 ),
               ),
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
 
               // Physical Stats
               Row(
@@ -429,7 +432,7 @@ class _EditProfileViewState extends State<EditProfileView> {
                       keyboardType: TextInputType.number,
                     ),
                   ),
-                  SizedBox(width: 10),
+                  const SizedBox(width: 10),
                   Container(
                     width: 50,
                     height: 50,
@@ -448,7 +451,7 @@ class _EditProfileViewState extends State<EditProfileView> {
                   ),
                 ],
               ),
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
 
               Row(
                 children: [
@@ -460,7 +463,7 @@ class _EditProfileViewState extends State<EditProfileView> {
                       keyboardType: TextInputType.number,
                     ),
                   ),
-                  SizedBox(width: 10),
+                  const SizedBox(width: 10),
                   Container(
                     width: 50,
                     height: 50,
@@ -479,7 +482,7 @@ class _EditProfileViewState extends State<EditProfileView> {
                   ),
                 ],
               ),
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
 
               RoundTextField(
                 controller: txtAge,
@@ -487,7 +490,7 @@ class _EditProfileViewState extends State<EditProfileView> {
                 icon: "assets/img/age.png",
                 keyboardType: TextInputType.number,
               ),
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
 
               // Goal Selection
               Container(
@@ -521,16 +524,18 @@ class _EditProfileViewState extends State<EditProfileView> {
                             "Improve Shape",
                             "Lean & Tone",
                             "Muscle Gain"
-                          ].map((goal) => DropdownMenuItem(
-                            value: goal,
-                            child: Text(
-                              goal,
-                              style: TextStyle(
-                                color: TColor.black,
-                                fontSize: 14,
-                              ),
-                            ),
-                          )).toList(),
+                          ]
+                              .map((goal) => DropdownMenuItem(
+                                    value: goal,
+                                    child: Text(
+                                      goal,
+                                      style: TextStyle(
+                                        color: TColor.black,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ))
+                              .toList(),
                           onChanged: (value) {
                             setState(() {
                               selectedGoal = value;
@@ -543,7 +548,7 @@ class _EditProfileViewState extends State<EditProfileView> {
                   ],
                 ),
               ),
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
 
               // Save Button
               _isSaving
@@ -552,14 +557,15 @@ class _EditProfileViewState extends State<EditProfileView> {
                       height: 50,
                       alignment: Alignment.center,
                       child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation(TColor.primaryColor1),
+                        valueColor:
+                            AlwaysStoppedAnimation(TColor.primaryColor1),
                       ),
                     )
                   : RoundButton(
                       title: "Save Changes",
                       onPressed: _saveProfile,
                     ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
             ],
           ),
         ),

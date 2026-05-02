@@ -15,7 +15,7 @@ class PosePainter extends CustomPainter {
     final Paint neonPaint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 4.0
-    // استبدلنا withOpacity بـ withValues لحل التحذير الأصفر
+      // استبدلنا withOpacity بـ withValues لحل التحذير الأصفر
       ..shader = ui.Gradient.linear(
         Offset(size.width / 2, 0),
         Offset(size.width / 2, size.height),
@@ -60,14 +60,19 @@ class PosePainter extends CustomPainter {
   }
 
   // ✅ التعديل هنا: استقبلنا Size size كمدخل
-  void paintConnections(Canvas canvas, Size size, Map<PoseLandmarkType, PoseLandmark> landmarks, Paint paintType) {
+  void paintConnections(Canvas canvas, Size size,
+      Map<PoseLandmarkType, PoseLandmark> landmarks, Paint paintType) {
     void paintConnection(PoseLandmarkType type1, PoseLandmarkType type2) {
       final landmark1 = landmarks[type1]; // شيلنا ! عشان نتأكد تحت
       final landmark2 = landmarks[type2];
 
       // التأكد إن النقاط موجودة ودقتها عالية
-      if (landmark1 == null || landmark2 == null ||
-          landmark1.likelihood < 0.5 || landmark2.likelihood < 0.5) return;
+      if (landmark1 == null ||
+          landmark2 == null ||
+          landmark1.likelihood < 0.5 ||
+          landmark2.likelihood < 0.5) {
+        return;
+      }
 
       canvas.drawLine(
         Offset(
@@ -83,7 +88,8 @@ class PosePainter extends CustomPainter {
     }
 
     // رسم الجسم
-    paintConnection(PoseLandmarkType.leftShoulder, PoseLandmarkType.rightShoulder);
+    paintConnection(
+        PoseLandmarkType.leftShoulder, PoseLandmarkType.rightShoulder);
     paintConnection(PoseLandmarkType.leftHip, PoseLandmarkType.rightHip);
     paintConnection(PoseLandmarkType.leftShoulder, PoseLandmarkType.leftHip);
     paintConnection(PoseLandmarkType.rightShoulder, PoseLandmarkType.rightHip);
@@ -91,7 +97,8 @@ class PosePainter extends CustomPainter {
     // الذراعات
     paintConnection(PoseLandmarkType.leftShoulder, PoseLandmarkType.leftElbow);
     paintConnection(PoseLandmarkType.leftElbow, PoseLandmarkType.leftWrist);
-    paintConnection(PoseLandmarkType.rightShoulder, PoseLandmarkType.rightElbow);
+    paintConnection(
+        PoseLandmarkType.rightShoulder, PoseLandmarkType.rightElbow);
     paintConnection(PoseLandmarkType.rightElbow, PoseLandmarkType.rightWrist);
 
     // الأرجل
@@ -107,7 +114,8 @@ class PosePainter extends CustomPainter {
   }
 
   // دوال التحويل
-  double translateX(double x, InputImageRotation rotation, Size size, Size absoluteImageSize) {
+  double translateX(double x, InputImageRotation rotation, Size size,
+      Size absoluteImageSize) {
     switch (rotation) {
       case InputImageRotation.rotation90deg:
         return x * size.width / absoluteImageSize.height;
@@ -118,7 +126,8 @@ class PosePainter extends CustomPainter {
     }
   }
 
-  double translateY(double y, InputImageRotation rotation, Size size, Size absoluteImageSize) {
+  double translateY(double y, InputImageRotation rotation, Size size,
+      Size absoluteImageSize) {
     switch (rotation) {
       case InputImageRotation.rotation90deg:
       case InputImageRotation.rotation270deg:

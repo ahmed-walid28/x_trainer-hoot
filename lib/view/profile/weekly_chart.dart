@@ -42,11 +42,14 @@ class WeeklyChart extends StatelessWidget {
               child: BarChart(
                 BarChartData(
                   borderData: FlBorderData(show: false),
-                  gridData: FlGridData(show: false),
+                  gridData: const FlGridData(show: false),
                   titlesData: FlTitlesData(
-                    leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    leftTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false)),
+                    rightTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false)),
+                    topTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false)),
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
@@ -97,7 +100,9 @@ class WeeklyChart extends StatelessWidget {
   Map<int, int> _processData() {
     Map<int, int> days = {};
     DateTime now = DateTime.now();
-    for (int i = 0; i < 7; i++) days[i] = 0;
+    for (int i = 0; i < 7; i++) {
+      days[i] = 0;
+    }
 
     for (var doc in workoutDocs) {
       final data = doc.data() as Map<String, dynamic>;

@@ -80,7 +80,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
   Future<void> _initializeCamera() async {
     final cameras = await availableCameras();
     final frontCamera = cameras.firstWhere(
-          (camera) => camera.lensDirection == CameraLensDirection.front,
+      (camera) => camera.lensDirection == CameraLensDirection.front,
       orElse: () => cameras.first,
     );
 
@@ -119,38 +119,51 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
         // ==========================================
         if (widget.exerciseType == 'squat') {
           squatCounter.check(pose);
-          if (squatCounter.count > previousCount) _speak("${squatCounter.count}");
-          _updateData(squatCounter.count, squatCounter.stage, squatCounter.feedback);
-        }
-        else if (widget.exerciseType == 'push_up') {
+          if (squatCounter.count > previousCount) {
+            _speak("${squatCounter.count}");
+          }
+          _updateData(
+              squatCounter.count, squatCounter.stage, squatCounter.feedback);
+        } else if (widget.exerciseType == 'push_up') {
           pushUpCounter.check(pose);
-          if (pushUpCounter.count > previousCount) _speak("${pushUpCounter.count}");
-          _updateData(pushUpCounter.count, pushUpCounter.stage, pushUpCounter.feedback);
-        }
-        else if (widget.exerciseType == 'hammer_curl') {
+          if (pushUpCounter.count > previousCount) {
+            _speak("${pushUpCounter.count}");
+          }
+          _updateData(
+              pushUpCounter.count, pushUpCounter.stage, pushUpCounter.feedback);
+        } else if (widget.exerciseType == 'hammer_curl') {
           curlCounter.check(pose);
           if (curlCounter.count > previousCount) _speak("${curlCounter.count}");
-          _updateData(curlCounter.count, curlCounter.stage, curlCounter.feedback);
-        }
-        else if (widget.exerciseType == 'lateral_raise') {
+          _updateData(
+              curlCounter.count, curlCounter.stage, curlCounter.feedback);
+        } else if (widget.exerciseType == 'lateral_raise') {
           lateralRaiseCounter.check(pose);
-          if (lateralRaiseCounter.count > previousCount) _speak("${lateralRaiseCounter.count}");
-          _updateData(lateralRaiseCounter.count, lateralRaiseCounter.stage, lateralRaiseCounter.feedback);
-        }
-        else if (widget.exerciseType == 'jumping_jack') {
+          if (lateralRaiseCounter.count > previousCount) {
+            _speak("${lateralRaiseCounter.count}");
+          }
+          _updateData(lateralRaiseCounter.count, lateralRaiseCounter.stage,
+              lateralRaiseCounter.feedback);
+        } else if (widget.exerciseType == 'jumping_jack') {
           jumpingJackCounter.check(pose);
-          if (jumpingJackCounter.count > previousCount) _speak("${jumpingJackCounter.count}");
-          _updateData(jumpingJackCounter.count, jumpingJackCounter.stage, jumpingJackCounter.feedback);
-        }
-        else if (widget.exerciseType == 'shoulder_press') {
+          if (jumpingJackCounter.count > previousCount) {
+            _speak("${jumpingJackCounter.count}");
+          }
+          _updateData(jumpingJackCounter.count, jumpingJackCounter.stage,
+              jumpingJackCounter.feedback);
+        } else if (widget.exerciseType == 'shoulder_press') {
           shoulderPressCounter.check(pose);
-          if (shoulderPressCounter.count > previousCount) _speak("${shoulderPressCounter.count}");
-          _updateData(shoulderPressCounter.count, shoulderPressCounter.stage, shoulderPressCounter.feedback);
-        }
-        else if (widget.exerciseType == 'lunges') {
+          if (shoulderPressCounter.count > previousCount) {
+            _speak("${shoulderPressCounter.count}");
+          }
+          _updateData(shoulderPressCounter.count, shoulderPressCounter.stage,
+              shoulderPressCounter.feedback);
+        } else if (widget.exerciseType == 'lunges') {
           lungesCounter.check(pose);
-          if (lungesCounter.count > previousCount) _speak("${lungesCounter.count}");
-          _updateData(lungesCounter.count, lungesCounter.stage, lungesCounter.feedback);
+          if (lungesCounter.count > previousCount) {
+            _speak("${lungesCounter.count}");
+          }
+          _updateData(
+              lungesCounter.count, lungesCounter.stage, lungesCounter.feedback);
         }
       }
 
@@ -159,7 +172,6 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
           _poses = poses;
         });
       }
-
     } catch (e) {
       print('Error: $e');
     } finally {
@@ -169,7 +181,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
 
   void _updateData(int count, String stage, String feedback) {
     if (_counter != count || _stage != stage || _feedback != feedback) {
-      if(mounted) {
+      if (mounted) {
         setState(() {
           _counter = count;
           _stage = stage;
@@ -216,7 +228,8 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const Text("REPS", style: TextStyle(color: Colors.grey, fontSize: 10)),
+                  const Text("REPS",
+                      style: TextStyle(color: Colors.grey, fontSize: 10)),
                 ],
               ),
             ),
@@ -225,7 +238,9 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                 children: [
                   Icon(
                     _stage == "UP" ? Icons.arrow_upward : Icons.arrow_downward,
-                    color: _stage == "UP" ? Colors.greenAccent : Colors.orangeAccent,
+                    color: _stage == "UP"
+                        ? Colors.greenAccent
+                        : Colors.orangeAccent,
                     size: 40,
                   ),
                   const SizedBox(height: 5),
@@ -237,8 +252,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 1.2,
-                        shadows: [Shadow(color: Colors.black, blurRadius: 2)]
-                    ),
+                        shadows: [Shadow(color: Colors.black, blurRadius: 2)]),
                   ),
                 ],
               ),
@@ -263,7 +277,8 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                   shape: BoxShape.circle,
                   border: Border.all(color: Colors.redAccent),
                 ),
-                child: const Icon(Icons.stop, color: Colors.redAccent, size: 30),
+                child:
+                    const Icon(Icons.stop, color: Colors.redAccent, size: 30),
               ),
             ),
           ],
@@ -290,7 +305,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                 _cameraController!.value.previewSize!,
                 InputImageRotation.rotation270deg,
               ),
-              child: SizedBox.expand(),
+              child: const SizedBox.expand(),
             ),
           _buildHUD(),
         ],
@@ -303,7 +318,8 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     final sensorOrientation = camera.sensorOrientation;
     InputImageRotation rotation = InputImageRotation.rotation270deg;
     if (Platform.isAndroid) {
-      rotation = InputImageRotationValue.fromRawValue(sensorOrientation) ?? InputImageRotation.rotation270deg;
+      rotation = InputImageRotationValue.fromRawValue(sensorOrientation) ??
+          InputImageRotation.rotation270deg;
     }
     final format = InputImageFormatValue.fromRawValue(image.format.raw);
     if (format == null) return null;

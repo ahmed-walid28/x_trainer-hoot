@@ -28,7 +28,7 @@ class TabButton extends StatelessWidget {
             fit: BoxFit.fitWidth,
             // إضافة معالجة الخطأ إذا الصورة غير موجودة
             errorBuilder: (context, error, stackTrace) {
-              return Icon(
+              return const Icon(
                 Icons.error_outline,
                 color: Colors.grey,
                 size: 25,

@@ -1,8 +1,6 @@
 import 'package:x_trainer/common/color_extension.dart';
 import 'package:flutter/material.dart';
 
-import '../common/common.dart';
-
 class TodayMealRow extends StatelessWidget {
   final Map mObj;
   const TodayMealRow({super.key, required this.mObj});

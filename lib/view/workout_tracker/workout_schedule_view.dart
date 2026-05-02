@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../common/color_extension.dart';
@@ -79,24 +78,24 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
       return dateToStartDate(wObj["date"] as DateTime) == date;
     }).toList();
 
-    if( mounted  ) {
-      setState(() {
-
-      });
+    if (mounted) {
+      setState(() {});
     }
   }
 
   Widget _buildCalendar() {
-    return Container(
+    return SizedBox(
       height: 100,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: 30, // 30 يوم
         itemBuilder: (context, index) {
           DateTime date = DateTime.now().add(Duration(days: index - 15));
-          bool isSelected = dateToStartDate(date) == dateToStartDate(_selectedDateAppBBar);
+          bool isSelected =
+              dateToStartDate(date) == dateToStartDate(_selectedDateAppBBar);
           bool hasEvent = eventArr.any((event) {
-            var eventDate = stringToDate(event["start_time"].toString(), formatStr: "dd/MM/yyyy hh:mm aa");
+            var eventDate = stringToDate(event["start_time"].toString(),
+                formatStr: "dd/MM/yyyy hh:mm aa");
             return dateToStartDate(eventDate) == dateToStartDate(date);
           });
 
@@ -109,9 +108,10 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
             },
             child: Container(
               width: 60,
-              margin: EdgeInsets.symmetric(horizontal: 4),
+              margin: const EdgeInsets.symmetric(horizontal: 4),
               decoration: BoxDecoration(
-                gradient: isSelected ? LinearGradient(colors: TColor.primaryG) : null,
+                gradient:
+                    isSelected ? LinearGradient(colors: TColor.primaryG) : null,
                 color: isSelected ? null : TColor.lightGray,
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -126,7 +126,7 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
                     _getDayName(date.weekday),
                     style: TextStyle(
@@ -136,7 +136,7 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
                   ),
                   if (hasEvent)
                     Container(
-                      margin: EdgeInsets.only(top: 4),
+                      margin: const EdgeInsets.only(top: 4),
                       width: 6,
                       height: 6,
                       decoration: BoxDecoration(
@@ -155,14 +155,22 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
 
   String _getDayName(int weekday) {
     switch (weekday) {
-      case 1: return 'Mon';
-      case 2: return 'Tue';
-      case 3: return 'Wed';
-      case 4: return 'Thu';
-      case 5: return 'Fri';
-      case 6: return 'Sat';
-      case 7: return 'Sun';
-      default: return '';
+      case 1:
+        return 'Mon';
+      case 2:
+        return 'Tue';
+      case 3:
+        return 'Wed';
+      case 4:
+        return 'Thu';
+      case 5:
+        return 'Fri';
+      case 6:
+        return 'Sat';
+      case 7:
+        return 'Sun';
+      default:
+        return '';
     }
   }
 
@@ -260,171 +268,178 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
                             if (slotArr.isNotEmpty)
                               Expanded(
                                   child: Stack(
-                                    alignment: Alignment.centerLeft,
-                                    children: slotArr.map((sObj) {
-                                      var min = (sObj["date"] as DateTime).minute;
-                                      var pos = (min / 60) * 2 - 1;
+                                alignment: Alignment.centerLeft,
+                                children: slotArr.map((sObj) {
+                                  var min = (sObj["date"] as DateTime).minute;
+                                  var pos = (min / 60) * 2 - 1;
 
-                                      return Align(
-                                        alignment: Alignment(pos, 0),
-                                        child: InkWell(
-                                          onTap: () {
-                                            showDialog(
-                                              context: context,
-                                              builder: (context) {
-                                                return AlertDialog(
-                                                  backgroundColor: Colors.transparent,
-                                                  contentPadding: EdgeInsets.zero,
-                                                  content: Container(
-                                                    padding: const EdgeInsets.symmetric( vertical:15 , horizontal: 20 ),
-                                                    decoration: BoxDecoration(
-                                                      color: TColor.white,
-                                                      borderRadius:
+                                  return Align(
+                                    alignment: Alignment(pos, 0),
+                                    child: InkWell(
+                                      onTap: () {
+                                        showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            return AlertDialog(
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                              contentPadding: EdgeInsets.zero,
+                                              content: Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 15,
+                                                        horizontal: 20),
+                                                decoration: BoxDecoration(
+                                                  color: TColor.white,
+                                                  borderRadius:
                                                       BorderRadius.circular(20),
-                                                    ),
-                                                    child: Column(
-                                                      mainAxisSize: MainAxisSize.min,
-                                                      crossAxisAlignment:
+                                                ),
+                                                child: Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  crossAxisAlignment:
                                                       CrossAxisAlignment.start,
+                                                  children: [
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
                                                       children: [
-                                                        Row(
-                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                          children: [
-                                                            InkWell(
-                                                              onTap: () {
-                                                                Navigator.pop(
-                                                                    context);
-                                                              },
-                                                              child: Container(
-                                                                margin:
+                                                        InkWell(
+                                                          onTap: () {
+                                                            Navigator.pop(
+                                                                context);
+                                                          },
+                                                          child: Container(
+                                                            margin:
                                                                 const EdgeInsets
                                                                     .all(8),
-                                                                height: 40,
-                                                                width: 40,
-                                                                alignment:
-                                                                Alignment.center,
-                                                                decoration: BoxDecoration(
-                                                                    color: TColor
-                                                                        .lightGray,
-                                                                    borderRadius:
+                                                            height: 40,
+                                                            width: 40,
+                                                            alignment: Alignment
+                                                                .center,
+                                                            decoration: BoxDecoration(
+                                                                color: TColor
+                                                                    .lightGray,
+                                                                borderRadius:
                                                                     BorderRadius
                                                                         .circular(
-                                                                        10)),
-                                                                child: Image.asset(
-                                                                  "assets/img/closed_btn.png",
-                                                                  width: 15,
-                                                                  height: 15,
-                                                                  fit: BoxFit.contain,
-                                                                ),
-                                                              ),
+                                                                            10)),
+                                                            child: Image.asset(
+                                                              "assets/img/closed_btn.png",
+                                                              width: 15,
+                                                              height: 15,
+                                                              fit: BoxFit
+                                                                  .contain,
                                                             ),
-                                                            Text(
-                                                              "Workout Schedule",
-                                                              style: TextStyle(
-                                                                  color: TColor.black,
-                                                                  fontSize: 16,
-                                                                  fontWeight:
-                                                                  FontWeight
-                                                                      .w700),
-                                                            ),
-                                                            InkWell(
-                                                              onTap: () {},
-                                                              child: Container(
-                                                                margin:
-                                                                const EdgeInsets
-                                                                    .all(8),
-                                                                height: 40,
-                                                                width: 40,
-                                                                alignment:
-                                                                Alignment.center,
-                                                                decoration: BoxDecoration(
-                                                                    color: TColor
-                                                                        .lightGray,
-                                                                    borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                        10)),
-                                                                child: Image.asset(
-                                                                  "assets/img/more_btn.png",
-                                                                  width: 15,
-                                                                  height: 15,
-                                                                  fit: BoxFit.contain,
-                                                                ),
-                                                              ),
-                                                            )
-                                                          ],
-                                                        ),
-                                                        const SizedBox(
-                                                          height: 15,
+                                                          ),
                                                         ),
                                                         Text(
-                                                          sObj["name"].toString(),
+                                                          "Workout Schedule",
                                                           style: TextStyle(
-                                                              color: TColor.black,
-                                                              fontSize: 14,
+                                                              color:
+                                                                  TColor.black,
+                                                              fontSize: 16,
                                                               fontWeight:
-                                                              FontWeight.w700),
+                                                                  FontWeight
+                                                                      .w700),
                                                         ),
-                                                        const SizedBox(
-                                                          height: 4,
-                                                        ),
-                                                        Row(children: [
-                                                          Image.asset(
-                                                            "assets/img/time_workout.png",
-                                                            height: 20,
-                                                            width: 20,
+                                                        InkWell(
+                                                          onTap: () {},
+                                                          child: Container(
+                                                            margin:
+                                                                const EdgeInsets
+                                                                    .all(8),
+                                                            height: 40,
+                                                            width: 40,
+                                                            alignment: Alignment
+                                                                .center,
+                                                            decoration: BoxDecoration(
+                                                                color: TColor
+                                                                    .lightGray,
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            10)),
+                                                            child: Image.asset(
+                                                              "assets/img/more_btn.png",
+                                                              width: 15,
+                                                              height: 15,
+                                                              fit: BoxFit
+                                                                  .contain,
+                                                            ),
                                                           ),
-                                                          const SizedBox(
-                                                            width: 8,
-                                                          ),
-                                                          Text(
-                                                            "${ getDayTitle(sObj["start_time"].toString()) }|${getStringDateToOtherFormate(sObj["start_time"].toString(), outFormatStr: "h:mm aa")}",
-                                                            style: TextStyle(
-                                                                color: TColor.gray,
-                                                                fontSize: 12),
-                                                          )
-                                                        ]),
-
-                                                        const SizedBox(
-                                                          height: 15,
-                                                        ),
-
-                                                        RoundButton(
-                                                            title: "Mark Done",
-                                                            onPressed: () {}),
-
+                                                        )
                                                       ],
                                                     ),
-                                                  ),
-                                                );
-                                              },
+                                                    const SizedBox(
+                                                      height: 15,
+                                                    ),
+                                                    Text(
+                                                      sObj["name"].toString(),
+                                                      style: TextStyle(
+                                                          color: TColor.black,
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.w700),
+                                                    ),
+                                                    const SizedBox(
+                                                      height: 4,
+                                                    ),
+                                                    Row(children: [
+                                                      Image.asset(
+                                                        "assets/img/time_workout.png",
+                                                        height: 20,
+                                                        width: 20,
+                                                      ),
+                                                      const SizedBox(
+                                                        width: 8,
+                                                      ),
+                                                      Text(
+                                                        "${getDayTitle(sObj["start_time"].toString())}|${getStringDateToOtherFormate(sObj["start_time"].toString(), outFormatStr: "h:mm aa")}",
+                                                        style: TextStyle(
+                                                            color: TColor.gray,
+                                                            fontSize: 12),
+                                                      )
+                                                    ]),
+                                                    const SizedBox(
+                                                      height: 15,
+                                                    ),
+                                                    RoundButton(
+                                                        title: "Mark Done",
+                                                        onPressed: () {}),
+                                                  ],
+                                                ),
+                                              ),
                                             );
                                           },
-                                          child: Container(
-                                            height: 35,
-                                            width: availWidth * 0.5,
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 8),
-                                            alignment: Alignment.centerLeft,
-                                            decoration: BoxDecoration(
-                                              gradient: LinearGradient(
-                                                  colors: TColor.secondaryG),
-                                              borderRadius:
+                                        );
+                                      },
+                                      child: Container(
+                                        height: 35,
+                                        width: availWidth * 0.5,
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8),
+                                        alignment: Alignment.centerLeft,
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                              colors: TColor.secondaryG),
+                                          borderRadius:
                                               BorderRadius.circular(17.5),
-                                            ),
-                                            child: Text(
-                                              "${sObj["name"].toString()}, ${getStringDateToOtherFormate(sObj["start_time"].toString(), outFormatStr: "h:mm aa")}",
-                                              maxLines: 1,
-                                              style: TextStyle(
-                                                color: TColor.white,
-                                                fontSize: 12,
-                                              ),
-                                            ),
+                                        ),
+                                        child: Text(
+                                          "${sObj["name"].toString()}, ${getStringDateToOtherFormate(sObj["start_time"].toString(), outFormatStr: "h:mm aa")}",
+                                          maxLines: 1,
+                                          style: TextStyle(
+                                            color: TColor.white,
+                                            fontSize: 12,
                                           ),
                                         ),
-                                      );
-                                    }).toList(),
-                                  ))
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                              ))
                           ],
                         ),
                       );
@@ -447,8 +462,8 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
               context,
               MaterialPageRoute(
                   builder: (context) => AddScheduleView(
-                    date: _selectedDateAppBBar,
-                  )));
+                        date: _selectedDateAppBBar,
+                      )));
         },
         child: Container(
           width: 55,

@@ -48,8 +48,9 @@ class SquatCounter {
         feedback = "Great!";
       }
 
-      if (stage == "DOWN" && backAngle < 100) feedback = "Straighten Back!";
-      else if (stage == "DOWN" && kneeAngle > 100) feedback = "Go Lower!";
+      if (stage == "DOWN" && backAngle < 100) {
+        feedback = "Straighten Back!";
+      } else if (stage == "DOWN" && kneeAngle > 100) feedback = "Go Lower!";
     }
   }
 }
@@ -69,7 +70,11 @@ class PushUpCounter {
     final hip = pose.landmarks[PoseLandmarkType.leftHip];
     final ankle = pose.landmarks[PoseLandmarkType.leftAnkle];
 
-    if (shoulder != null && elbow != null && wrist != null && hip != null && ankle != null) {
+    if (shoulder != null &&
+        elbow != null &&
+        wrist != null &&
+        hip != null &&
+        ankle != null) {
       double elbowAngle = PoseUtils.calculateAngle(shoulder, elbow, wrist);
       double bodyLineAngle = PoseUtils.calculateAngle(shoulder, hip, ankle);
 
@@ -167,15 +172,19 @@ class JumpingJackCounter {
     final leftAnkle = pose.landmarks[PoseLandmarkType.leftAnkle];
     final rightAnkle = pose.landmarks[PoseLandmarkType.rightAnkle];
 
-    if (leftShoulder != null && rightShoulder != null &&
-        leftWrist != null && rightWrist != null &&
-        leftAnkle != null && rightAnkle != null) {
-
+    if (leftShoulder != null &&
+        rightShoulder != null &&
+        leftWrist != null &&
+        rightWrist != null &&
+        leftAnkle != null &&
+        rightAnkle != null) {
       double legDistance = (leftAnkle.x - rightAnkle.x).abs();
       double shoulderWidth = (leftShoulder.x - rightShoulder.x).abs();
 
-      bool handsUp = leftWrist.y < leftShoulder.y && rightWrist.y < rightShoulder.y;
-      bool handsDown = leftWrist.y > leftShoulder.y && rightWrist.y > rightShoulder.y;
+      bool handsUp =
+          leftWrist.y < leftShoulder.y && rightWrist.y < rightShoulder.y;
+      bool handsDown =
+          leftWrist.y > leftShoulder.y && rightWrist.y > rightShoulder.y;
 
       if (handsUp && legDistance > shoulderWidth * 1.5) {
         stage = "UP";

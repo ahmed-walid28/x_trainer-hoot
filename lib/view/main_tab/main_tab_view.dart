@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:x_trainer/common/color_extension.dart';
-import 'package:x_trainer/common_widget/tab_button.dart';
 
 import '../home/home_view.dart';
 import '../meal_planner/meal_planner_view.dart';

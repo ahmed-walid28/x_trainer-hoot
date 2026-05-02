@@ -56,7 +56,8 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
     return Container(
-      decoration: BoxDecoration(gradient: LinearGradient(colors: TColor.primaryG)),
+      decoration:
+          BoxDecoration(gradient: LinearGradient(colors: TColor.primaryG)),
       child: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
@@ -126,18 +127,18 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
                           (LineChartBarData barData, List<int> spotIndexes) {
                         return spotIndexes.map((index) {
                           return TouchedSpotIndicatorData(
-                            FlLine(
+                            const FlLine(
                               color: Colors.transparent,
                             ),
                             FlDotData(
                               show: true,
                               getDotPainter: (spot, percent, barData, index) =>
                                   FlDotCirclePainter(
-                                    radius: 3,
-                                    color: Colors.white,
-                                    strokeWidth: 3,
-                                    strokeColor: TColor.secondaryColor1,
-                                  ),
+                                radius: 3,
+                                color: Colors.white,
+                                strokeWidth: 3,
+                                strokeColor: TColor.secondaryColor1,
+                              ),
                             ),
                           );
                         }).toList();
@@ -213,7 +214,8 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
                 ),
                 SizedBox(height: media.width * 0.05),
                 Container(
-                  padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
                   decoration: BoxDecoration(
                     color: TColor.primaryColor2.withAlpha((0.3 * 255).toInt()),
                     borderRadius: BorderRadius.circular(15),
@@ -241,7 +243,8 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const ExerciseSelectionScreen(),
+                                builder: (context) =>
+                                    const ExerciseSelectionScreen(),
                               ),
                             );
                           },
@@ -323,63 +326,76 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
 
   // --- دوال الرسم البياني ---
   List<LineChartBarData> get lineBarsData1 => [
-    lineChartBarData1_1,
-    lineChartBarData1_2,
-  ];
+        lineChartBarData1_1,
+        lineChartBarData1_2,
+      ];
 
   LineChartBarData get lineChartBarData1_1 => LineChartBarData(
-    isCurved: true,
-    color: TColor.white,
-    barWidth: 4,
-    isStrokeCapRound: true,
-    dotData: const FlDotData(show: false),
-    belowBarData: BarAreaData(show: false),
-    spots: const [
-      FlSpot(1, 35),
-      FlSpot(2, 70),
-      FlSpot(3, 40),
-      FlSpot(4, 80),
-      FlSpot(5, 25),
-      FlSpot(6, 70),
-      FlSpot(7, 35),
-    ],
-  );
+        isCurved: true,
+        color: TColor.white,
+        barWidth: 4,
+        isStrokeCapRound: true,
+        dotData: const FlDotData(show: false),
+        belowBarData: BarAreaData(show: false),
+        spots: const [
+          FlSpot(1, 35),
+          FlSpot(2, 70),
+          FlSpot(3, 40),
+          FlSpot(4, 80),
+          FlSpot(5, 25),
+          FlSpot(6, 70),
+          FlSpot(7, 35),
+        ],
+      );
 
   LineChartBarData get lineChartBarData1_2 => LineChartBarData(
-    isCurved: true,
-    color: TColor.white.withOpacity(0.5),
-    barWidth: 2,
-    isStrokeCapRound: true,
-    dotData: const FlDotData(show: false),
-    belowBarData: BarAreaData(show: false),
-    spots: const [
-      FlSpot(1, 80),
-      FlSpot(2, 50),
-      FlSpot(3, 90),
-      FlSpot(4, 40),
-      FlSpot(5, 80),
-      FlSpot(6, 35),
-      FlSpot(7, 60),
-    ],
-  );
+        isCurved: true,
+        color: TColor.white.withOpacity(0.5),
+        barWidth: 2,
+        isStrokeCapRound: true,
+        dotData: const FlDotData(show: false),
+        belowBarData: BarAreaData(show: false),
+        spots: const [
+          FlSpot(1, 80),
+          FlSpot(2, 50),
+          FlSpot(3, 90),
+          FlSpot(4, 40),
+          FlSpot(5, 80),
+          FlSpot(6, 35),
+          FlSpot(7, 60),
+        ],
+      );
 
   SideTitles get rightTitles => SideTitles(
-    getTitlesWidget: rightTitleWidgets,
-    showTitles: true,
-    interval: 20,
-    reservedSize: 40,
-  );
+        getTitlesWidget: rightTitleWidgets,
+        showTitles: true,
+        interval: 20,
+        reservedSize: 40,
+      );
 
   Widget rightTitleWidgets(double value, TitleMeta meta) {
     String text;
     switch (value.toInt()) {
-      case 0: text = '0%'; break;
-      case 20: text = '20%'; break;
-      case 40: text = '40%'; break;
-      case 60: text = '60%'; break;
-      case 80: text = '80%'; break;
-      case 100: text = '100%'; break;
-      default: return Container();
+      case 0:
+        text = '0%';
+        break;
+      case 20:
+        text = '20%';
+        break;
+      case 40:
+        text = '40%';
+        break;
+      case 60:
+        text = '60%';
+        break;
+      case 80:
+        text = '80%';
+        break;
+      case 100:
+        text = '100%';
+        break;
+      default:
+        return Container();
     }
     return Text(text,
         style: TextStyle(color: TColor.white, fontSize: 12),
@@ -387,24 +403,40 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
   }
 
   SideTitles get bottomTitles => SideTitles(
-    showTitles: true,
-    reservedSize: 32,
-    interval: 1,
-    getTitlesWidget: bottomTitleWidgets,
-  );
+        showTitles: true,
+        reservedSize: 32,
+        interval: 1,
+        getTitlesWidget: bottomTitleWidgets,
+      );
 
   Widget bottomTitleWidgets(double value, TitleMeta meta) {
     var style = TextStyle(color: TColor.white, fontSize: 12);
     Widget text;
     switch (value.toInt()) {
-      case 1: text = Text('Sun', style: style); break;
-      case 2: text = Text('Mon', style: style); break;
-      case 3: text = Text('Tue', style: style); break;
-      case 4: text = Text('Wed', style: style); break;
-      case 5: text = Text('Thu', style: style); break;
-      case 6: text = Text('Fri', style: style); break;
-      case 7: text = Text('Sat', style: style); break;
-      default: text = const Text(''); break;
+      case 1:
+        text = Text('Sun', style: style);
+        break;
+      case 2:
+        text = Text('Mon', style: style);
+        break;
+      case 3:
+        text = Text('Tue', style: style);
+        break;
+      case 4:
+        text = Text('Wed', style: style);
+        break;
+      case 5:
+        text = Text('Thu', style: style);
+        break;
+      case 6:
+        text = Text('Fri', style: style);
+        break;
+      case 7:
+        text = Text('Sat', style: style);
+        break;
+      default:
+        text = const Text('');
+        break;
     }
     return SideTitleWidget(axisSide: meta.axisSide, space: 10, child: text);
   }

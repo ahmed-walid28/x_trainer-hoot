@@ -40,7 +40,7 @@ class _SleepScheduleViewState extends State<SleepScheduleView> {
   }
 
   Widget _buildCalendar() {
-    return Container(
+    return SizedBox(
       height: 100,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
@@ -49,7 +49,8 @@ class _SleepScheduleViewState extends State<SleepScheduleView> {
           DateTime date = DateTime.now().add(Duration(days: index - 15));
           bool isSelected = _isSameDay(date, _selectedDateAppBBar);
           bool hasEvent = todaySleepArr.any((event) {
-            var eventDate = stringToDate(event["time"].toString(), formatStr: "dd/MM/yyyy hh:mm aa");
+            var eventDate = stringToDate(event["time"].toString(),
+                formatStr: "dd/MM/yyyy hh:mm aa");
             return _isSameDay(eventDate, date);
           });
 
@@ -61,9 +62,10 @@ class _SleepScheduleViewState extends State<SleepScheduleView> {
             },
             child: Container(
               width: 60,
-              margin: EdgeInsets.symmetric(horizontal: 4),
+              margin: const EdgeInsets.symmetric(horizontal: 4),
               decoration: BoxDecoration(
-                gradient: isSelected ? LinearGradient(colors: TColor.primaryG) : null,
+                gradient:
+                    isSelected ? LinearGradient(colors: TColor.primaryG) : null,
                 color: isSelected ? null : TColor.lightGray,
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -78,7 +80,7 @@ class _SleepScheduleViewState extends State<SleepScheduleView> {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
                     _getDayName(date.weekday),
                     style: TextStyle(
@@ -88,7 +90,7 @@ class _SleepScheduleViewState extends State<SleepScheduleView> {
                   ),
                   if (hasEvent)
                     Container(
-                      margin: EdgeInsets.only(top: 4),
+                      margin: const EdgeInsets.only(top: 4),
                       width: 6,
                       height: 6,
                       decoration: BoxDecoration(
@@ -113,19 +115,28 @@ class _SleepScheduleViewState extends State<SleepScheduleView> {
 
   String _getDayName(int weekday) {
     switch (weekday) {
-      case 1: return 'Mon';
-      case 2: return 'Tue';
-      case 3: return 'Wed';
-      case 4: return 'Thu';
-      case 5: return 'Fri';
-      case 6: return 'Sat';
-      case 7: return 'Sun';
-      default: return '';
+      case 1:
+        return 'Mon';
+      case 2:
+        return 'Tue';
+      case 3:
+        return 'Wed';
+      case 4:
+        return 'Thu';
+      case 5:
+        return 'Fri';
+      case 6:
+        return 'Sat';
+      case 7:
+        return 'Sun';
+      default:
+        return '';
     }
   }
 
   // إضافة الدوال المساعدة للتواريخ
-  DateTime stringToDate(String dateStr, {String formatStr = "dd/MM/yyyy hh:mm aa"}) {
+  DateTime stringToDate(String dateStr,
+      {String formatStr = "dd/MM/yyyy hh:mm aa"}) {
     try {
       List<String> parts = dateStr.split(' ');
       if (parts.length >= 2) {
@@ -207,7 +218,7 @@ class _SleepScheduleViewState extends State<SleepScheduleView> {
               children: [
                 Padding(
                   padding:
-                  const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   child: Container(
                     width: double.maxFinite,
                     padding: const EdgeInsets.all(20),
@@ -264,7 +275,7 @@ class _SleepScheduleViewState extends State<SleepScheduleView> {
                 ),
                 Padding(
                   padding:
-                  const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   child: Text(
                     "Your Schedule",
                     style: TextStyle(
@@ -275,7 +286,8 @@ class _SleepScheduleViewState extends State<SleepScheduleView> {
                 ),
                 // Calendar البديل
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                   child: _buildCalendar(),
                 ),
                 SizedBox(

@@ -7,7 +7,7 @@ AI Coach Terminal Chat - Talk to the chatbot directly!
 import requests
 import json
 
-URL = "http://localhost:5000/chat"
+URL = "http://localhost:5001/chat"  # Groq Server
 profile = {}
 
 print("=" * 60)
@@ -72,6 +72,6 @@ while True:
     except requests.exceptions.ConnectionError:
         print("Connection failed!")
         print("Make sure the server is running:")
-        print("   cd models && python ai_server_v2.py\n")
+        print("   cd models && python ai_server_groq.py\n")
     except Exception as e:
         print(f"Error: {e}\n")

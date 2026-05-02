@@ -38,7 +38,7 @@ class _PhotoProgressViewState extends State<PhotoProgressView> {
 // حالياً بنعمل snackbar علشان نعرض confirmation
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+      const SnackBar(
         content: Text('Camera functionality - Coming Soon!'),
         duration: Duration(seconds: 2),
       ),
@@ -54,19 +54,19 @@ class _PhotoProgressViewState extends State<PhotoProgressView> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Photo Reminder'),
-        content: Text('Set a reminder for your next progress photo?'),
+        title: const Text('Photo Reminder'),
+        content: const Text('Set a reminder for your next progress photo?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Cancel'),
+            child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               _setPhotoReminder();
             },
-            child: Text('Set Reminder'),
+            child: const Text('Set Reminder'),
           ),
         ],
       ),
@@ -75,7 +75,7 @@ class _PhotoProgressViewState extends State<PhotoProgressView> {
 
   void _setPhotoReminder() {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+      const SnackBar(
         content: Text('Reminder set for next progress photo!'),
         duration: Duration(seconds: 2),
       ),
@@ -128,7 +128,7 @@ class _PhotoProgressViewState extends State<PhotoProgressView> {
               children: [
                 Padding(
                   padding:
-                  const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   child: Container(
                     width: double.maxFinite,
                     padding: const EdgeInsets.all(15),
@@ -180,7 +180,7 @@ class _PhotoProgressViewState extends State<PhotoProgressView> {
                                 onPressed: () {
 // زر الإغلاق - بيخفي الـ reminder
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
+                                    const SnackBar(
                                       content: Text('Reminder dismissed'),
                                       duration: Duration(seconds: 1),
                                     ),
@@ -197,7 +197,7 @@ class _PhotoProgressViewState extends State<PhotoProgressView> {
                 ),
                 Padding(
                   padding:
-                  const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   child: Container(
                     width: double.maxFinite,
                     padding: const EdgeInsets.all(20),
@@ -250,7 +250,7 @@ class _PhotoProgressViewState extends State<PhotoProgressView> {
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 20),
                   padding:
-                  const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                      const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
                   decoration: BoxDecoration(
                     color: TColor.primaryColor2.withOpacity(0.3),
                     borderRadius: BorderRadius.circular(15),
@@ -277,8 +277,7 @@ class _PhotoProgressViewState extends State<PhotoProgressView> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                const ComparisonView(),
+                                builder: (context) => const ComparisonView(),
                               ),
                             );
                           },
@@ -289,7 +288,7 @@ class _PhotoProgressViewState extends State<PhotoProgressView> {
                 ),
                 Padding(
                   padding:
-                  const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -327,7 +326,7 @@ class _PhotoProgressViewState extends State<PhotoProgressView> {
                             child: Text(
                               pObj["time"].toString(),
                               style:
-                              TextStyle(color: TColor.gray, fontSize: 12),
+                                  TextStyle(color: TColor.gray, fontSize: 12),
                             ),
                           ),
                           SizedBox(
@@ -339,11 +338,12 @@ class _PhotoProgressViewState extends State<PhotoProgressView> {
                               itemBuilder: ((context, indexRow) {
                                 return GestureDetector(
                                   onTap: () {
-                                    _viewPhotoDetails(imaArr[indexRow] as String);
+                                    _viewPhotoDetails(
+                                        imaArr[indexRow] as String);
                                   },
                                   child: Container(
-                                    margin:
-                                    const EdgeInsets.symmetric(horizontal: 4),
+                                    margin: const EdgeInsets.symmetric(
+                                        horizontal: 4),
                                     width: 100,
                                     decoration: BoxDecoration(
                                       color: TColor.lightGray,
@@ -401,12 +401,13 @@ class _PhotoProgressViewState extends State<PhotoProgressView> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Track Your Progress'),
-        content: Text('Taking monthly progress photos helps you visualize your fitness journey and stay motivated. Compare your current photos with previous ones to see your improvements!'),
+        title: const Text('Track Your Progress'),
+        content: const Text(
+            'Taking monthly progress photos helps you visualize your fitness journey and stay motivated. Compare your current photos with previous ones to see your improvements!'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Got it!'),
+            child: const Text('Got it!'),
           ),
         ],
       ),
@@ -415,7 +416,7 @@ class _PhotoProgressViewState extends State<PhotoProgressView> {
 
   void _viewAllPhotos() {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+      const SnackBar(
         content: Text('Opening full gallery...'),
         duration: Duration(seconds: 2),
       ),
@@ -445,7 +446,7 @@ class _PhotoProgressViewState extends State<PhotoProgressView> {
               right: 10,
               child: IconButton(
                 onPressed: () => Navigator.pop(context),
-                icon: Icon(Icons.close, color: Colors.white),
+                icon: const Icon(Icons.close, color: Colors.white),
               ),
             ),
           ],

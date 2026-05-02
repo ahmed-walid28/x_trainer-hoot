@@ -86,7 +86,7 @@ class _MealScheduleViewState extends State<MealScheduleView> {
   }
 
   Widget _buildCalendar() {
-    return Container(
+    return SizedBox(
       height: 100,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
@@ -104,9 +104,10 @@ class _MealScheduleViewState extends State<MealScheduleView> {
             },
             child: Container(
               width: 60,
-              margin: EdgeInsets.symmetric(horizontal: 4),
+              margin: const EdgeInsets.symmetric(horizontal: 4),
               decoration: BoxDecoration(
-                gradient: isSelected ? LinearGradient(colors: TColor.primaryG) : null,
+                gradient:
+                    isSelected ? LinearGradient(colors: TColor.primaryG) : null,
                 color: isSelected ? null : TColor.lightGray,
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -121,7 +122,7 @@ class _MealScheduleViewState extends State<MealScheduleView> {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
                     _getDayName(date.weekday),
                     style: TextStyle(
@@ -131,7 +132,7 @@ class _MealScheduleViewState extends State<MealScheduleView> {
                   ),
                   if (hasMeal)
                     Container(
-                      margin: EdgeInsets.only(top: 4),
+                      margin: const EdgeInsets.only(top: 4),
                       width: 6,
                       height: 6,
                       decoration: BoxDecoration(
@@ -162,14 +163,22 @@ class _MealScheduleViewState extends State<MealScheduleView> {
 
   String _getDayName(int weekday) {
     switch (weekday) {
-      case 1: return 'Mon';
-      case 2: return 'Tue';
-      case 3: return 'Wed';
-      case 4: return 'Thu';
-      case 5: return 'Fri';
-      case 6: return 'Sat';
-      case 7: return 'Sun';
-      default: return '';
+      case 1:
+        return 'Mon';
+      case 2:
+        return 'Tue';
+      case 3:
+        return 'Wed';
+      case 4:
+        return 'Thu';
+      case 5:
+        return 'Fri';
+      case 6:
+        return 'Sat';
+      case 7:
+        return 'Sun';
+      default:
+        return '';
     }
   }
 
@@ -238,181 +247,181 @@ class _MealScheduleViewState extends State<MealScheduleView> {
           ),
           Expanded(
               child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "BreakFast",
-                            style: TextStyle(
-                                color: TColor.black,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700),
-                          ),
-                          TextButton(
-                            onPressed: () {},
-                            child: Text(
-                              "${breakfastArr.length} Items | 230 calories",
-                              style: TextStyle(color: TColor.gray, fontSize: 12),
-                            ),
-                          )
-                        ],
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "BreakFast",
+                        style: TextStyle(
+                            color: TColor.black,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700),
                       ),
-                    ),
-                    ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 15),
-                        physics: const NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        itemCount: breakfastArr.length,
-                        itemBuilder: (context, index) {
-                          var mObj = breakfastArr[index] as Map? ?? {};
-                          return MealFoodScheduleRow(
-                            mObj: mObj,
-                            index: index,
-                          );
-                        }),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Lunch",
-                            style: TextStyle(
-                                color: TColor.black,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700),
-                          ),
-                          TextButton(
-                            onPressed: () {},
-                            child: Text(
-                              "${lunchArr.length} Items | 500 calories",
-                              style: TextStyle(color: TColor.gray, fontSize: 12),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 15),
-                        physics: const NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        itemCount: lunchArr.length,
-                        itemBuilder: (context, index) {
-                          var mObj = lunchArr[index] as Map? ?? {};
-                          return MealFoodScheduleRow(
-                            mObj: mObj,
-                            index: index,
-                          );
-                        }),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Snacks",
-                            style: TextStyle(
-                                color: TColor.black,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700),
-                          ),
-                          TextButton(
-                            onPressed: () {},
-                            child: Text(
-                              "${snacksArr.length} Items | 140 calories",
-                              style: TextStyle(color: TColor.gray, fontSize: 12),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 15),
-                        physics: const NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        itemCount: snacksArr.length,
-                        itemBuilder: (context, index) {
-                          var mObj = snacksArr[index] as Map? ?? {};
-                          return MealFoodScheduleRow(
-                            mObj: mObj,
-                            index: index,
-                          );
-                        }),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Dinner",
-                            style: TextStyle(
-                                color: TColor.black,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700),
-                          ),
-                          TextButton(
-                            onPressed: () {},
-                            child: Text(
-                              "${dinnerArr.length} Items | 120 calories",
-                              style: TextStyle(color: TColor.gray, fontSize: 12),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 15),
-                        physics: const NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        itemCount: dinnerArr.length,
-                        itemBuilder: (context, index) {
-                          var mObj = dinnerArr[index] as Map? ?? {};
-                          return MealFoodScheduleRow(
-                            mObj: mObj,
-                            index: index,
-                          );
-                        }),
-                    SizedBox(
-                      height: media.width * 0.05,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Today Meal Nutritions",
-                            style: TextStyle(
-                                color: TColor.black,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700),
-                          ),
-                        ],
-                      ),
-                    ),
-                    ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 15),
-                        physics: const NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        itemCount: nutritionArr.length,
-                        itemBuilder: (context, index) {
-                          var nObj = nutritionArr[index] as Map? ?? {};
-
-                          return NutritionRow(
-                            nObj: nObj,
-                          );
-                        }),
-                    SizedBox(
-                      height: media.width * 0.05,
-                    )
-                  ],
+                      TextButton(
+                        onPressed: () {},
+                        child: Text(
+                          "${breakfastArr.length} Items | 230 calories",
+                          style: TextStyle(color: TColor.gray, fontSize: 12),
+                        ),
+                      )
+                    ],
+                  ),
                 ),
-              ))
+                ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: breakfastArr.length,
+                    itemBuilder: (context, index) {
+                      var mObj = breakfastArr[index] as Map? ?? {};
+                      return MealFoodScheduleRow(
+                        mObj: mObj,
+                        index: index,
+                      );
+                    }),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Lunch",
+                        style: TextStyle(
+                            color: TColor.black,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700),
+                      ),
+                      TextButton(
+                        onPressed: () {},
+                        child: Text(
+                          "${lunchArr.length} Items | 500 calories",
+                          style: TextStyle(color: TColor.gray, fontSize: 12),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: lunchArr.length,
+                    itemBuilder: (context, index) {
+                      var mObj = lunchArr[index] as Map? ?? {};
+                      return MealFoodScheduleRow(
+                        mObj: mObj,
+                        index: index,
+                      );
+                    }),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Snacks",
+                        style: TextStyle(
+                            color: TColor.black,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700),
+                      ),
+                      TextButton(
+                        onPressed: () {},
+                        child: Text(
+                          "${snacksArr.length} Items | 140 calories",
+                          style: TextStyle(color: TColor.gray, fontSize: 12),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: snacksArr.length,
+                    itemBuilder: (context, index) {
+                      var mObj = snacksArr[index] as Map? ?? {};
+                      return MealFoodScheduleRow(
+                        mObj: mObj,
+                        index: index,
+                      );
+                    }),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Dinner",
+                        style: TextStyle(
+                            color: TColor.black,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700),
+                      ),
+                      TextButton(
+                        onPressed: () {},
+                        child: Text(
+                          "${dinnerArr.length} Items | 120 calories",
+                          style: TextStyle(color: TColor.gray, fontSize: 12),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: dinnerArr.length,
+                    itemBuilder: (context, index) {
+                      var mObj = dinnerArr[index] as Map? ?? {};
+                      return MealFoodScheduleRow(
+                        mObj: mObj,
+                        index: index,
+                      );
+                    }),
+                SizedBox(
+                  height: media.width * 0.05,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Today Meal Nutritions",
+                        style: TextStyle(
+                            color: TColor.black,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700),
+                      ),
+                    ],
+                  ),
+                ),
+                ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: nutritionArr.length,
+                    itemBuilder: (context, index) {
+                      var nObj = nutritionArr[index] as Map? ?? {};
+
+                      return NutritionRow(
+                        nObj: nObj,
+                      );
+                    }),
+                SizedBox(
+                  height: media.width * 0.05,
+                )
+              ],
+            ),
+          ))
         ],
       ),
     );

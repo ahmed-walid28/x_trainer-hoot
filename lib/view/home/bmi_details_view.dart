@@ -8,7 +8,6 @@ class BMIDetailsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final media = MediaQuery.of(context).size;
     final profile = Provider.of<ProfileProvider>(context);
 
     final double? height = double.tryParse(profile.height);
@@ -25,19 +24,23 @@ class BMIDetailsView extends StatelessWidget {
 
       if (bmi < 18.5) {
         category = "Underweight";
-        categoryDescription = "You need to gain weight. Consider increasing your calorie intake and building muscle mass.";
+        categoryDescription =
+            "You need to gain weight. Consider increasing your calorie intake and building muscle mass.";
         categoryColor = Colors.blue;
       } else if (bmi < 25) {
         category = "Normal Weight";
-        categoryDescription = "Great job! You have a healthy weight. Maintain it with regular exercise and balanced diet.";
+        categoryDescription =
+            "Great job! You have a healthy weight. Maintain it with regular exercise and balanced diet.";
         categoryColor = Colors.green;
       } else if (bmi < 30) {
         category = "Overweight";
-        categoryDescription = "Consider losing some weight through diet and exercise to reach a healthier range.";
+        categoryDescription =
+            "Consider losing some weight through diet and exercise to reach a healthier range.";
         categoryColor = Colors.orange;
       } else {
         category = "Obese";
-        categoryDescription = "It's recommended to consult a healthcare professional and start a weight loss program.";
+        categoryDescription =
+            "It's recommended to consult a healthcare professional and start a weight loss program.";
         categoryColor = Colors.red;
       }
     }
@@ -123,14 +126,15 @@ class BMIDetailsView extends StatelessWidget {
                       ),
                     const SizedBox(height: 10),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 8),
                       decoration: BoxDecoration(
                         color: categoryColor.withValues(alpha: 0.9),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
                         category,
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -217,10 +221,14 @@ class BMIDetailsView extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 15),
-              _buildCategoryItem("Underweight", "< 18.5", Colors.blue, bmi != null && bmi < 18.5),
-              _buildCategoryItem("Normal weight", "18.5 - 24.9", Colors.green, bmi != null && bmi >= 18.5 && bmi < 25),
-              _buildCategoryItem("Overweight", "25 - 29.9", Colors.orange, bmi != null && bmi >= 25 && bmi < 30),
-              _buildCategoryItem("Obese", "≥ 30", Colors.red, bmi != null && bmi >= 30),
+              _buildCategoryItem("Underweight", "< 18.5", Colors.blue,
+                  bmi != null && bmi < 18.5),
+              _buildCategoryItem("Normal weight", "18.5 - 24.9", Colors.green,
+                  bmi != null && bmi >= 18.5 && bmi < 25),
+              _buildCategoryItem("Overweight", "25 - 29.9", Colors.orange,
+                  bmi != null && bmi >= 25 && bmi < 30),
+              _buildCategoryItem(
+                  "Obese", "≥ 30", Colors.red, bmi != null && bmi >= 30),
               const SizedBox(height: 30),
 
               // Formula Info
@@ -304,16 +312,15 @@ class BMIDetailsView extends StatelessWidget {
     );
   }
 
-  Widget _buildCategoryItem(String label, String range, Color color, bool isActive) {
+  Widget _buildCategoryItem(
+      String label, String range, Color color, bool isActive) {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
       decoration: BoxDecoration(
         color: isActive ? color.withValues(alpha: 0.1) : TColor.lightGray,
         borderRadius: BorderRadius.circular(15),
-        border: isActive
-            ? Border.all(color: color, width: 2)
-            : null,
+        border: isActive ? Border.all(color: color, width: 2) : null,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

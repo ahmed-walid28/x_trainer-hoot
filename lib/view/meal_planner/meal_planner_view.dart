@@ -39,14 +39,14 @@ class _MealPlannerViewState extends State<MealPlannerView> {
   List<int> showingTooltipOnSpots = [4];
 
   List<FlSpot> get allSpots => [
-    FlSpot(1, 35),
-    FlSpot(2, 70),
-    FlSpot(3, 40),
-    FlSpot(4, 80),
-    FlSpot(5, 25),
-    FlSpot(6, 70),
-    FlSpot(7, 35),
-  ];
+        const FlSpot(1, 35),
+        const FlSpot(2, 70),
+        const FlSpot(3, 40),
+        const FlSpot(4, 80),
+        const FlSpot(5, 25),
+        const FlSpot(6, 70),
+        const FlSpot(7, 35),
+      ];
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +58,7 @@ class _MealPlannerViewState extends State<MealPlannerView> {
         isCurved: true,
         barWidth: 3,
         belowBarData: BarAreaData(show: false),
-        dotData: FlDotData(show: false),
+        dotData: const FlDotData(show: false),
         gradient: LinearGradient(colors: TColor.primaryG),
       ),
     ];
@@ -130,18 +130,18 @@ class _MealPlannerViewState extends State<MealPlannerView> {
                             child: DropdownButton(
                               items: ["Weekly", "Monthly"]
                                   .map((name) => DropdownMenuItem(
-                                value: name,
-                                child: Text(
-                                  name,
-                                  style: TextStyle(
-                                      color: TColor.gray, fontSize: 14),
-                                ),
-                              ))
+                                        value: name,
+                                        child: Text(
+                                          name,
+                                          style: TextStyle(
+                                              color: TColor.gray, fontSize: 14),
+                                        ),
+                                      ))
                                   .toList(),
                               onChanged: (value) {
                                 _handleTimeframeChange(value.toString());
                               },
-                              icon: Icon(Icons.expand_more,
+                              icon: const Icon(Icons.expand_more,
                                   color: Colors.white),
                               hint: Text(
                                 "Weekly",
@@ -163,17 +163,17 @@ class _MealPlannerViewState extends State<MealPlannerView> {
                       child: LineChart(
                         LineChartData(
                           showingTooltipIndicators:
-                          showingTooltipOnSpots.isNotEmpty
-                              ? showingTooltipOnSpots.map((index) {
-                            return ShowingTooltipIndicators([
-                              LineBarSpot(
-                                tooltipsOnBar,
-                                0,
-                                tooltipsOnBar.spots[index],
-                              ),
-                            ]);
-                          }).toList()
-                              : [],
+                              showingTooltipOnSpots.isNotEmpty
+                                  ? showingTooltipOnSpots.map((index) {
+                                      return ShowingTooltipIndicators([
+                                        LineBarSpot(
+                                          tooltipsOnBar,
+                                          0,
+                                          tooltipsOnBar.spots[index],
+                                        ),
+                                      ]);
+                                    }).toList()
+                                  : [],
                           lineTouchData: LineTouchData(
                             enabled: true,
                             handleBuiltInTouches: false,
@@ -204,19 +204,19 @@ class _MealPlannerViewState extends State<MealPlannerView> {
                                 List<int> spotIndexes) {
                               return spotIndexes.map((index) {
                                 return TouchedSpotIndicatorData(
-                                  FlLine(
+                                  const FlLine(
                                     color: Colors.transparent,
                                   ),
                                   FlDotData(
                                     show: true,
                                     getDotPainter:
                                         (spot, percent, barData, index) =>
-                                        FlDotCirclePainter(
-                                          radius: 3,
-                                          color: Colors.white,
-                                          strokeWidth: 3,
-                                          strokeColor: TColor.secondaryColor1,
-                                        ),
+                                            FlDotCirclePainter(
+                                      radius: 3,
+                                      color: Colors.white,
+                                      strokeWidth: 3,
+                                      strokeColor: TColor.secondaryColor1,
+                                    ),
                                   ),
                                 );
                               }).toList();
@@ -229,7 +229,7 @@ class _MealPlannerViewState extends State<MealPlannerView> {
                                 return lineBarsSpot.map((lineBarSpot) {
                                   return LineTooltipItem(
                                     "Day ${lineBarSpot.x.toInt()}: ${lineBarSpot.y.toInt()} calories",
-                                    TextStyle(
+                                    const TextStyle(
                                       color: Colors.white,
                                       fontSize: 10,
                                       fontWeight: FontWeight.bold,
@@ -251,13 +251,13 @@ class _MealPlannerViewState extends State<MealPlannerView> {
                                   reservedSize: 40,
                                 ),
                               ),
-                              topTitles: AxisTitles(
+                              topTitles: const AxisTitles(
                                 sideTitles: SideTitles(showTitles: false),
                               ),
                               bottomTitles: AxisTitles(
                                 sideTitles: bottomTitles,
                               ),
-                              rightTitles: AxisTitles(
+                              rightTitles: const AxisTitles(
                                 sideTitles: SideTitles(showTitles: false),
                               )),
                           gridData: FlGridData(
@@ -291,7 +291,7 @@ class _MealPlannerViewState extends State<MealPlannerView> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => AiDietView(),
+                          builder: (context) => const AiDietView(),
                         ),
                       );
                     },
@@ -301,7 +301,7 @@ class _MealPlannerViewState extends State<MealPlannerView> {
                       decoration: BoxDecoration(
                         gradient: LinearGradient(colors: TColor.primaryG),
                         borderRadius: BorderRadius.circular(25),
-                        boxShadow: [
+                        boxShadow: const [
                           BoxShadow(
                             color: Colors.black26,
                             blurRadius: 4,
@@ -309,7 +309,7 @@ class _MealPlannerViewState extends State<MealPlannerView> {
                           )
                         ],
                       ),
-                      child: Row(
+                      child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.auto_awesome, color: Colors.white),
@@ -359,7 +359,8 @@ class _MealPlannerViewState extends State<MealPlannerView> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => MealScheduleView(),
+                                  builder: (context) =>
+                                      const MealScheduleView(),
                                 ),
                               );
                             },
@@ -398,18 +399,18 @@ class _MealPlannerViewState extends State<MealPlannerView> {
                                 "Dessert"
                               ]
                                   .map((name) => DropdownMenuItem(
-                                value: name,
-                                child: Text(
-                                  name,
-                                  style: TextStyle(
-                                      color: TColor.gray, fontSize: 14),
-                                ),
-                              ))
+                                        value: name,
+                                        child: Text(
+                                          name,
+                                          style: TextStyle(
+                                              color: TColor.gray, fontSize: 14),
+                                        ),
+                                      ))
                                   .toList(),
                               onChanged: (value) {
                                 _handleMealTypeChange(value.toString());
                               },
-                              icon: Icon(Icons.expand_more,
+                              icon: const Icon(Icons.expand_more,
                                   color: Colors.white),
                               hint: Text(
                                 "Breakfast",
@@ -426,14 +427,14 @@ class _MealPlannerViewState extends State<MealPlannerView> {
                   ),
                   ListView.builder(
                       padding: EdgeInsets.zero,
-                      physics: NeverScrollableScrollPhysics(),
+                      physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       itemCount: todayMealArr.length,
                       itemBuilder: (context, index) {
                         var mObj = todayMealArr[index] as Map? ?? {};
                         return Container(
-                          margin: EdgeInsets.only(bottom: 15),
-                          padding: EdgeInsets.all(12),
+                          margin: const EdgeInsets.only(bottom: 15),
+                          padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
                             color: index == 0
                                 ? TColor.primaryColor1.withOpacity(0.3)
@@ -459,7 +460,7 @@ class _MealPlannerViewState extends State<MealPlannerView> {
                                   ),
                                 ),
                               ),
-                              SizedBox(width: 12),
+                              const SizedBox(width: 12),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -471,7 +472,7 @@ class _MealPlannerViewState extends State<MealPlannerView> {
                                           fontSize: 14,
                                           fontWeight: FontWeight.w600),
                                     ),
-                                    SizedBox(height: 4),
+                                    const SizedBox(height: 4),
                                     Text(
                                       mObj["time"]?.toString() ?? "",
                                       style: TextStyle(
@@ -498,7 +499,7 @@ class _MealPlannerViewState extends State<MealPlannerView> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.0),
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Text(
                 "Find Something to Eat",
                 style: TextStyle(
@@ -511,7 +512,7 @@ class _MealPlannerViewState extends State<MealPlannerView> {
             SizedBox(
               height: media.width * 0.55, // زودنا الارتفاع لحل الـ Overflow
               child: ListView.builder(
-                  padding: EdgeInsets.symmetric(horizontal: 15.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 15.0),
                   scrollDirection: Axis.horizontal,
                   itemCount: findEatArr.length,
                   itemBuilder: (context, index) {
@@ -525,7 +526,7 @@ class _MealPlannerViewState extends State<MealPlannerView> {
                                     MealFoodDetailsView(eObj: fObj)));
                       },
                       child: Container(
-                        margin: EdgeInsets.only(right: 15),
+                        margin: const EdgeInsets.only(right: 15),
                         width: media.width * 0.45,
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
@@ -544,14 +545,14 @@ class _MealPlannerViewState extends State<MealPlannerView> {
                               width: media.width * 0.45,
                               height: media.width * 0.25,
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.only(
+                                borderRadius: const BorderRadius.only(
                                   topLeft: Radius.circular(15),
                                   topRight: Radius.circular(15),
                                 ),
                                 color: TColor.white,
                               ),
                               child: ClipRRect(
-                                borderRadius: BorderRadius.only(
+                                borderRadius: const BorderRadius.only(
                                   topLeft: Radius.circular(15),
                                   topRight: Radius.circular(15),
                                 ),
@@ -564,21 +565,21 @@ class _MealPlannerViewState extends State<MealPlannerView> {
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.all(12),
+                              padding: const EdgeInsets.all(12),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     fObj["name"]?.toString() ?? "",
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 14,
                                         fontWeight: FontWeight.w600),
                                   ),
-                                  SizedBox(height: 4),
+                                  const SizedBox(height: 4),
                                   Text(
                                     fObj["number"]?.toString() ?? "",
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 12,
                                         fontWeight: FontWeight.w400),
@@ -605,7 +606,7 @@ class _MealPlannerViewState extends State<MealPlannerView> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Viewing $timeframe nutrition data'),
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
@@ -614,7 +615,7 @@ class _MealPlannerViewState extends State<MealPlannerView> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Filtering by $mealType'),
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
@@ -625,10 +626,10 @@ class _MealPlannerViewState extends State<MealPlannerView> {
       backgroundColor: Colors.transparent,
       builder: (context) {
         return Container(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
             color: TColor.white,
-            borderRadius: BorderRadius.only(
+            borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(25),
               topRight: Radius.circular(25),
             ),
@@ -638,7 +639,7 @@ class _MealPlannerViewState extends State<MealPlannerView> {
             children: [
               ListTile(
                 leading: Icon(Icons.settings, color: TColor.primaryColor1),
-                title: Text('Meal Planner Settings'),
+                title: const Text('Meal Planner Settings'),
                 onTap: () {
                   Navigator.pop(context);
                   _openMealSettings();
@@ -646,7 +647,7 @@ class _MealPlannerViewState extends State<MealPlannerView> {
               ),
               ListTile(
                 leading: Icon(Icons.history, color: TColor.primaryColor1),
-                title: Text('Meal History'),
+                title: const Text('Meal History'),
                 onTap: () {
                   Navigator.pop(context);
                   _viewMealHistory();
@@ -654,7 +655,7 @@ class _MealPlannerViewState extends State<MealPlannerView> {
               ),
               ListTile(
                 leading: Icon(Icons.analytics, color: TColor.primaryColor1),
-                title: Text('Nutrition Reports'),
+                title: const Text('Nutrition Reports'),
                 onTap: () {
                   Navigator.pop(context);
                   _viewNutritionReports();
@@ -669,7 +670,7 @@ class _MealPlannerViewState extends State<MealPlannerView> {
 
   void _openMealSettings() {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+      const SnackBar(
         content: Text('Opening meal planner settings...'),
         duration: Duration(seconds: 2),
       ),
@@ -678,7 +679,7 @@ class _MealPlannerViewState extends State<MealPlannerView> {
 
   void _viewMealHistory() {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+      const SnackBar(
         content: Text('Viewing meal history...'),
         duration: Duration(seconds: 2),
       ),
@@ -687,7 +688,7 @@ class _MealPlannerViewState extends State<MealPlannerView> {
 
   void _viewNutritionReports() {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+      const SnackBar(
         content: Text('Opening nutrition reports...'),
         duration: Duration(seconds: 2),
       ),
@@ -695,7 +696,7 @@ class _MealPlannerViewState extends State<MealPlannerView> {
   }
 
   Widget leftTitleWidgets(double value, TitleMeta meta) {
-    TextStyle style = TextStyle(
+    TextStyle style = const TextStyle(
       color: Colors.grey,
       fontWeight: FontWeight.bold,
       fontSize: 10,
@@ -724,11 +725,11 @@ class _MealPlannerViewState extends State<MealPlannerView> {
   }
 
   SideTitles get bottomTitles => SideTitles(
-    showTitles: true,
-    reservedSize: 32,
-    interval: 1,
-    getTitlesWidget: bottomTitleWidgets,
-  );
+        showTitles: true,
+        reservedSize: 32,
+        interval: 1,
+        getTitlesWidget: bottomTitleWidgets,
+      );
 
   Widget bottomTitleWidgets(double value, TitleMeta meta) {
     TextStyle style = TextStyle(
@@ -759,7 +760,7 @@ class _MealPlannerViewState extends State<MealPlannerView> {
         text = Text('Sun', style: style);
         break;
       default:
-        text = Text('');
+        text = const Text('');
         break;
     }
     return SideTitleWidget(

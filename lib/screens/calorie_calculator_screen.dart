@@ -2,7 +2,6 @@ import 'dart:math' as math;
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import '../common/color_extension.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -10,7 +9,8 @@ class CalorieCalculatorScreen extends StatefulWidget {
   const CalorieCalculatorScreen({super.key});
 
   @override
-  State<CalorieCalculatorScreen> createState() => _CalorieCalculatorScreenState();
+  State<CalorieCalculatorScreen> createState() =>
+      _CalorieCalculatorScreenState();
 }
 
 class _CalorieCalculatorScreenState extends State<CalorieCalculatorScreen> {
@@ -52,9 +52,11 @@ class _CalorieCalculatorScreenState extends State<CalorieCalculatorScreen> {
 
     try {
       // ⚠️ هنا حطينا الـ IP بتاع السيرفر اللي ظهرلك في بايثون
-      var uri = Uri.parse('https://upward-exact-armed.ngrok-free.dev/analyze_food');
+      var uri =
+          Uri.parse('https://upward-exact-armed.ngrok-free.dev/analyze_food');
       var request = http.MultipartRequest('POST', uri);
-      request.files.add(await http.MultipartFile.fromPath('image', _selectedImage!.path));
+      request.files.add(
+          await http.MultipartFile.fromPath('image', _selectedImage!.path));
 
       // بنبعت الطلب ونستنى الرد من السيرفر بتاعك
       var response = await request.send();
@@ -73,7 +75,10 @@ class _CalorieCalculatorScreenState extends State<CalorieCalculatorScreen> {
           if (line.toLowerCase().startsWith("food name:")) {
             parsedName = line.substring(line.indexOf(":") + 1).trim();
           } else if (line.toLowerCase().startsWith("calories:")) {
-            parsedCalories = line.substring(line.indexOf(":") + 1).replaceAll(RegExp(r'[^0-9]'), '').trim();
+            parsedCalories = line
+                .substring(line.indexOf(":") + 1)
+                .replaceAll(RegExp(r'[^0-9]'), '')
+                .trim();
           }
         }
 
@@ -329,7 +334,8 @@ class _CalorieCalculatorScreenState extends State<CalorieCalculatorScreen> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   child: Column(
                     children: [
                       Row(
@@ -353,14 +359,15 @@ class _CalorieCalculatorScreenState extends State<CalorieCalculatorScreen> {
                               borderRadius: BorderRadius.circular(20),
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(0xffCAB3FF).withOpacity(0.16),
+                                  color:
+                                      const Color(0xffCAB3FF).withOpacity(0.16),
                                   blurRadius: 12,
                                   offset: const Offset(0, 4),
                                 ),
                               ],
                             ),
-                            child: Row(
-                              children: const [
+                            child: const Row(
+                              children: [
                                 Icon(
                                   Icons.circle,
                                   size: 7,
@@ -390,280 +397,341 @@ class _CalorieCalculatorScreenState extends State<CalorieCalculatorScreen> {
                       Expanded(
                         child: _selectedImage == null
                             ? Column(
-                          children: [
-                            const Spacer(),
-                            _buildDotRing(),
-                            const Spacer(),
-                            const SizedBox(height: 16),
-                            GestureDetector(
-                              onTap: _showImageSourceDialog,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 18),
-                                decoration: BoxDecoration(
-                                  gradient: const LinearGradient(
-                                    colors: [
-                                      Color(0xffF2A8D7),
-                                      Color(0xffA389FF),
-                                      Color(0xff8EBBFF),
-                                    ],
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                  ),
-                                  borderRadius: BorderRadius.circular(50),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: const Color(0xffC5A8FF).withOpacity(0.4),
-                                      blurRadius: 16,
-                                      offset: const Offset(0, 8),
-                                    ),
-                                  ],
-                                ),
-                                child: const Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(Icons.cloud_upload_outlined, color: Colors.white, size: 24),
-                                    SizedBox(width: 12),
-                                    Text(
-                                      'Tap to upload food image',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 50),
-                          ],
-                        )
-                            : SingleChildScrollView(
-                          child: Column(
-                            children: [
-                              const SizedBox(height: 12),
-                              Container(
-                                width: double.infinity,
-                                height: media.width * 0.65,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(28),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: const Color(0xffC5A8FF).withOpacity(0.2),
-                                      blurRadius: 16,
-                                      offset: const Offset(0, 6),
-                                    ),
-                                  ],
-                                ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(28),
-                                  child: Stack(
-                                    children: [
-                                      Image.file(_selectedImage!, fit: BoxFit.cover, width: double.infinity),
-                                      Positioned(
-                                        top: 10,
-                                        right: 10,
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            setState(() {
-                                              _selectedImage = null;
-                                              _calorieResult = null;
-                                              _foodName = null;
-                                            });
-                                          },
-                                          child: Container(
-                                            padding: const EdgeInsets.all(8),
-                                            decoration: BoxDecoration(
-                                              color: Colors.black.withOpacity(0.5),
-                                              shape: BoxShape.circle,
-                                            ),
-                                            child: const Icon(Icons.close, color: Colors.white, size: 18),
-                                          ),
+                                children: [
+                                  const Spacer(),
+                                  _buildDotRing(),
+                                  const Spacer(),
+                                  const SizedBox(height: 16),
+                                  GestureDetector(
+                                    onTap: _showImageSourceDialog,
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 40, vertical: 18),
+                                      decoration: BoxDecoration(
+                                        gradient: const LinearGradient(
+                                          colors: [
+                                            Color(0xffF2A8D7),
+                                            Color(0xffA389FF),
+                                            Color(0xff8EBBFF),
+                                          ],
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 20),
-                              SizedBox(
-                                width: double.infinity,
-                                height: 52,
-                                child: ElevatedButton(
-                                  onPressed: _isAnalyzing ? null : _analyzeCalories,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.transparent,
-                                    shadowColor: Colors.transparent,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                                    padding: EdgeInsets.zero,
-                                  ),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      gradient: const LinearGradient(
-                                        colors: [
-                                          Color(0xffF2A8D7),
-                                          Color(0xffA389FF),
-                                          Color(0xff8EBBFF),
+                                        borderRadius: BorderRadius.circular(50),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: const Color(0xffC5A8FF)
+                                                .withOpacity(0.4),
+                                            blurRadius: 16,
+                                            offset: const Offset(0, 8),
+                                          ),
                                         ],
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
                                       ),
-                                      borderRadius: BorderRadius.circular(30),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: const Color(0xffC5A8FF).withOpacity(0.35),
-                                          blurRadius: 12,
-                                          offset: const Offset(0, 4),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Center(
-                                      child: _isAnalyzing
-                                          ? const Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
+                                      child: const Row(
+                                        mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          SizedBox(
-                                            width: 22,
-                                            height: 22,
-                                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                                          ),
+                                          Icon(Icons.cloud_upload_outlined,
+                                              color: Colors.white, size: 24),
                                           SizedBox(width: 12),
-                                          Text('Analyzing...', style: TextStyle(color: Colors.white, fontSize: 15)),
-                                        ],
-                                      )
-                                          : const Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Icon(Icons.calculate, color: Colors.white, size: 20),
-                                          SizedBox(width: 8),
-                                          Text('Analyze Calories', style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600)),
+                                          Text(
+                                            'Tap to upload food image',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
                                         ],
                                       ),
                                     ),
                                   ),
-                                ),
-                              ),
-                              if (_calorieResult != null) ...[
-                                const SizedBox(height: 20),
-                                Container(
-                                  width: double.infinity,
-                                  padding: const EdgeInsets.all(20),
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        const Color(0xffFCFBFF),
-                                        const Color(0xffF5F0FF),
-                                      ],
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                    ),
-                                    borderRadius: BorderRadius.circular(28),
-                                    border: Border.all(color: const Color(0xffE6DEFF)),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: const Color(0xffCBB8FF).withOpacity(0.12),
-                                        blurRadius: 16,
-                                        offset: const Offset(0, 6),
+                                  const SizedBox(height: 50),
+                                ],
+                              )
+                            : SingleChildScrollView(
+                                child: Column(
+                                  children: [
+                                    const SizedBox(height: 12),
+                                    Container(
+                                      width: double.infinity,
+                                      height: media.width * 0.65,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(28),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: const Color(0xffC5A8FF)
+                                                .withOpacity(0.2),
+                                            blurRadius: 16,
+                                            offset: const Offset(0, 6),
+                                          ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Container(
-                                            padding: const EdgeInsets.all(10),
-                                            decoration: const BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              gradient: LinearGradient(
-                                                colors: [
-                                                  Color(0xffF5A3D7),
-                                                  Color(0xffA8C2FF),
-                                                  Color(0xffB58BFF),
-                                                ],
-                                                begin: Alignment.topLeft,
-                                                end: Alignment.bottomRight,
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(28),
+                                        child: Stack(
+                                          children: [
+                                            Image.file(_selectedImage!,
+                                                fit: BoxFit.cover,
+                                                width: double.infinity),
+                                            Positioned(
+                                              top: 10,
+                                              right: 10,
+                                              child: GestureDetector(
+                                                onTap: () {
+                                                  setState(() {
+                                                    _selectedImage = null;
+                                                    _calorieResult = null;
+                                                    _foodName = null;
+                                                  });
+                                                },
+                                                child: Container(
+                                                  padding:
+                                                      const EdgeInsets.all(8),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.black
+                                                        .withOpacity(0.5),
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  child: const Icon(Icons.close,
+                                                      color: Colors.white,
+                                                      size: 18),
+                                                ),
                                               ),
                                             ),
-                                            child: const Icon(Icons.restaurant, color: Colors.white, size: 22),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 20),
+                                    SizedBox(
+                                      width: double.infinity,
+                                      height: 52,
+                                      child: ElevatedButton(
+                                        onPressed: _isAnalyzing
+                                            ? null
+                                            : _analyzeCalories,
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.transparent,
+                                          shadowColor: Colors.transparent,
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(30)),
+                                          padding: EdgeInsets.zero,
+                                        ),
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            gradient: const LinearGradient(
+                                              colors: [
+                                                Color(0xffF2A8D7),
+                                                Color(0xffA389FF),
+                                                Color(0xff8EBBFF),
+                                              ],
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                            ),
+                                            borderRadius:
+                                                BorderRadius.circular(30),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: const Color(0xffC5A8FF)
+                                                    .withOpacity(0.35),
+                                                blurRadius: 12,
+                                                offset: const Offset(0, 4),
+                                              ),
+                                            ],
                                           ),
-                                          const SizedBox(width: 12),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  _foodName ?? 'Meal',
-                                                  style: const TextStyle(
-                                                    color: Color(0xff5D4D85),
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.w500,
+                                          child: Center(
+                                            child: _isAnalyzing
+                                                ? const Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      SizedBox(
+                                                        width: 22,
+                                                        height: 22,
+                                                        child:
+                                                            CircularProgressIndicator(
+                                                                color: Colors
+                                                                    .white,
+                                                                strokeWidth: 2),
+                                                      ),
+                                                      SizedBox(width: 12),
+                                                      Text('Analyzing...',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontSize: 15)),
+                                                    ],
+                                                  )
+                                                : const Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Icon(Icons.calculate,
+                                                          color: Colors.white,
+                                                          size: 20),
+                                                      SizedBox(width: 8),
+                                                      Text('Analyze Calories',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontSize: 15,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600)),
+                                                    ],
                                                   ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    if (_calorieResult != null) ...[
+                                      const SizedBox(height: 20),
+                                      Container(
+                                        width: double.infinity,
+                                        padding: const EdgeInsets.all(20),
+                                        decoration: BoxDecoration(
+                                          gradient: const LinearGradient(
+                                            colors: [
+                                              Color(0xffFCFBFF),
+                                              Color(0xffF5F0FF),
+                                            ],
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(28),
+                                          border: Border.all(
+                                              color: const Color(0xffE6DEFF)),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: const Color(0xffCBB8FF)
+                                                  .withOpacity(0.12),
+                                              blurRadius: 16,
+                                              offset: const Offset(0, 6),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  padding:
+                                                      const EdgeInsets.all(10),
+                                                  decoration:
+                                                      const BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    gradient: LinearGradient(
+                                                      colors: [
+                                                        Color(0xffF5A3D7),
+                                                        Color(0xffA8C2FF),
+                                                        Color(0xffB58BFF),
+                                                      ],
+                                                      begin: Alignment.topLeft,
+                                                      end:
+                                                          Alignment.bottomRight,
+                                                    ),
+                                                  ),
+                                                  child: const Icon(
+                                                      Icons.restaurant,
+                                                      color: Colors.white,
+                                                      size: 22),
                                                 ),
-                                                const Text(
-                                                  'Estimated Nutrition',
-                                                  style: TextStyle(
-                                                    color: Color(0xff8E7AB7),
-                                                    fontSize: 13,
-                                                    fontWeight: FontWeight.w600,
+                                                const SizedBox(width: 12),
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        _foodName ?? 'Meal',
+                                                        style: const TextStyle(
+                                                          color:
+                                                              Color(0xff5D4D85),
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                        ),
+                                                      ),
+                                                      const Text(
+                                                        'Estimated Nutrition',
+                                                        style: TextStyle(
+                                                          color:
+                                                              Color(0xff8E7AB7),
+                                                          fontSize: 13,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
                                                 ),
                                               ],
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 16),
-                                      Row(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        children: [
-                                          Text(
-                                            _calorieResult!,
-                                            style: const TextStyle(
-                                              color: Color(0xff5F4E8E),
-                                              fontSize: 46,
-                                              fontWeight: FontWeight.bold,
+                                            const SizedBox(height: 16),
+                                            Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.end,
+                                              children: [
+                                                Text(
+                                                  _calorieResult!,
+                                                  style: const TextStyle(
+                                                    color: Color(0xff5F4E8E),
+                                                    fontSize: 46,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                const Text(
+                                                  ' kcal',
+                                                  style: TextStyle(
+                                                    color: Color(0xff8E7AB7),
+                                                    fontSize: 20,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                          ),
-                                          const Text(
-                                            ' kcal',
-                                            style: TextStyle(
-                                              color: Color(0xff8E7AB7),
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 12),
-                                      Container(
-                                        padding: const EdgeInsets.all(10),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white.withOpacity(0.6),
-                                          borderRadius: BorderRadius.circular(16),
-                                        ),
-                                        child: const Row(
-                                          children: [
-                                            Icon(Icons.info_outline, size: 16, color: Color(0xff8E7AB7)),
-                                            SizedBox(width: 8),
-                                            Expanded(
-                                              child: Text(
-                                                'Based on visual recognition • Powered by Gemini AI',
-                                                style: TextStyle(color: Color(0xff7B6BA3), fontSize: 11),
+                                            const SizedBox(height: 12),
+                                            Container(
+                                              padding: const EdgeInsets.all(10),
+                                              decoration: BoxDecoration(
+                                                color: Colors.white
+                                                    .withOpacity(0.6),
+                                                borderRadius:
+                                                    BorderRadius.circular(16),
+                                              ),
+                                              child: const Row(
+                                                children: [
+                                                  Icon(Icons.info_outline,
+                                                      size: 16,
+                                                      color: Color(0xff8E7AB7)),
+                                                  SizedBox(width: 8),
+                                                  Expanded(
+                                                    child: Text(
+                                                      'Based on visual recognition • Powered by Gemini AI',
+                                                      style: TextStyle(
+                                                          color:
+                                                              Color(0xff7B6BA3),
+                                                          fontSize: 11),
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             ),
                                           ],
                                         ),
                                       ),
                                     ],
-                                  ),
+                                    const SizedBox(height: 20),
+                                  ],
                                 ),
-                              ],
-                              const SizedBox(height: 20),
-                            ],
-                          ),
-                        ),
+                              ),
                       ),
                     ],
                   ),

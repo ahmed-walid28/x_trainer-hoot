@@ -432,7 +432,7 @@ class _ResultViewState extends State<ResultView> {
                                 List<int> spotIndexes) {
                               return spotIndexes.map((index) {
                                 return TouchedSpotIndicatorData(
-                                  FlLine(
+                                  const FlLine(
                                     color: Colors.transparent,
                                   ),
                                   FlDotData(
@@ -472,8 +472,8 @@ class _ResultViewState extends State<ResultView> {
                           maxY: 110,
                           titlesData: FlTitlesData(
                               show: true,
-                              leftTitles: AxisTitles(),
-                              topTitles: AxisTitles(),
+                              leftTitles: const AxisTitles(),
+                              topTitles: const AxisTitles(),
                               bottomTitles: AxisTitles(
                                 sideTitles: bottomTitles,
                               ),
@@ -559,20 +559,20 @@ class _ResultViewState extends State<ResultView> {
                                             color: TColor.gray, fontSize: 12),
                                       ),
                                     ),
-
                                     SimpleAnimationProgressBar(
-                          height: 10,
-                          width: media.width - 120,
-                          backgroundColor: TColor.primaryColor1,
-                          foregroundColor: const Color(0xffFFB2B1) ,
-                          ratio: (double.tryParse(iObj["diff_per"].toString()) ?? 0.0) / 100.0 ,
-                          direction: Axis.horizontal,
-                          curve: Curves.fastLinearToSlowEaseIn,
-                          duration: const Duration(seconds: 3),
-                          borderRadius: BorderRadius.circular(5),
-                          
-                        ),
-
+                                      height: 10,
+                                      width: media.width - 120,
+                                      backgroundColor: TColor.primaryColor1,
+                                      foregroundColor: const Color(0xffFFB2B1),
+                                      ratio: (double.tryParse(iObj["diff_per"]
+                                                  .toString()) ??
+                                              0.0) /
+                                          100.0,
+                                      direction: Axis.horizontal,
+                                      curve: Curves.fastLinearToSlowEaseIn,
+                                      duration: const Duration(seconds: 3),
+                                      borderRadius: BorderRadius.circular(5),
+                                    ),
                                     SizedBox(
                                       width: 25,
                                       child: Text(
@@ -588,7 +588,6 @@ class _ResultViewState extends State<ResultView> {
                                 )
                               ]);
                         }),
-                 
                     RoundButton(
                         title: "Back to Home",
                         onPressed: () {
@@ -623,7 +622,7 @@ class _ResultViewState extends State<ResultView> {
         gradient: LinearGradient(colors: TColor.primaryG),
         barWidth: 3,
         isStrokeCapRound: true,
-        dotData: FlDotData(show: false),
+        dotData: const FlDotData(show: false),
         belowBarData: BarAreaData(show: false),
         spots: const [
           FlSpot(1, 35),
@@ -644,7 +643,7 @@ class _ResultViewState extends State<ResultView> {
         ]),
         barWidth: 2,
         isStrokeCapRound: true,
-        dotData: FlDotData(show: false),
+        dotData: const FlDotData(show: false),
         belowBarData: BarAreaData(
           show: false,
         ),

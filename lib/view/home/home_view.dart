@@ -13,7 +13,6 @@ import '../../common/color_extension.dart';
 import '../../providers/profile_provider.dart';
 import '../profile/profile_view.dart';
 import '../profile/weekly_chart.dart';
-import 'activity_tracker_view.dart';
 import 'finished_workout_view.dart';
 import 'notification_view.dart';
 import 'chat_bot_view.dart';

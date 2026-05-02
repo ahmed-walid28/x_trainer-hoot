@@ -13,12 +13,11 @@ class UpcomingWorkoutRow extends StatefulWidget {
 class _UpcomingWorkoutRowState extends State<UpcomingWorkoutRow> {
   bool positive = false;
 
-
   @override
   Widget build(BuildContext context) {
     return Container(
         margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
-        padding: const EdgeInsets.all( 10),
+        padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
             color: TColor.white,
             borderRadius: BorderRadius.circular(15),
@@ -57,10 +56,9 @@ class _UpcomingWorkoutRowState extends State<UpcomingWorkoutRow> {
                 ),
               ],
             )),
-
-             CustomAnimatedToggleSwitch<bool>(
+            CustomAnimatedToggleSwitch<bool>(
               current: positive,
-              values: [false, true],
+              values: const [false, true],
               dif: 0.0,
               indicatorSize: const Size.square(30.0),
               animationDuration: const Duration(milliseconds: 200),
